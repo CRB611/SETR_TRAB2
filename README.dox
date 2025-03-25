@@ -16,8 +16,8 @@
 
 <b>File Structure:</b><br>
 <ul>
-    <li><i>.h:</i> Header file with the functions and structures. </li>
-    <li><i>.c:</i> SOurce file containing the implementation of the code needed to the </li>
+    <li><i>cmdproc.h:</i> Header file with the functions and structures. </li>
+    <li><i>cmdproc.c:</i> SOurce file containing the implementation of the code needed to the </li>
     <li><i>main.c:</i> Main file where it is shown that the module works and tests are run. </li>
 </ul>
 
