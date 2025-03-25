@@ -1,0 +1,33 @@
+/**
+
+@mainpage SETR Trabalho 2 - Doubly Linked List (DLL)
+
+@author Celina Brito
+@author Simão Ribeiro
+
+@brief This is our second assignment for our "Sistemas Embutidos e de Tempo Real" course, in this assignment we were asked to make
+
+@details . 
+<br>
+<b>Features</b><br>
+<ul>
+    <li><i>blabla:</i> blabla </li>
+</ul>
+
+<b>File Structure:</b><br>
+<ul>
+    <li><i>.h:</i> Header file with the functions and structures. </li>
+    <li><i>.c:</i> SOurce file containing the implementation of the code needed to the </li>
+    <li><i>main.c:</i> Main file where it is shown that the module works and tests are run. </li>
+</ul>
+
+
+<b>Usage:</b><br>
+To use this module run the make on the main folder and then run the main executable inside the bin foulder.
+
+<b>Test scenarios covered:</b><br>
+<ul>
+    <li>blablablab.</li>
+</ul>
+
+*/
