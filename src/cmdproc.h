@@ -36,7 +36,8 @@
 #define INV_COMM -2         ///< ERROR CODE: Invalid command
 #define CS_ERROR -3         ///< ERROR CODE: CS error detected (command not executed)
 #define WRONG_FORMAT -4     ///< ERROR CODE: The string format is wrong
-#define FULL_BUFF -1        ///< ERROR CODE: Full buffer
+#define FULL_BUFF -5        ///< ERROR CODE: Full buffer
+
 
 /* Function prototypes */
 /**
@@ -88,4 +89,10 @@ void getTxBuffer(unsigned char * buf, int * len);
  */
 int calcChecksum(unsigned char * buf, int nbytes);
 
+/**
+ * \brief Checks the state of the TX_BUFF
+ * \return Returns FULL_BUFF if the buffer is full
+ *  
+ */
+int getTxBufferLen(void);
 #endif

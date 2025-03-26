@@ -100,15 +100,12 @@ int cmdProcessor(void)
  * calcChecksum
  */ 
 int calcChecksum(unsigned char * buf, int nbytes) {
-	/* Here you are supposed to compute the modulo 256 checksum */
-	/* of the first n bytes of buf. Then you should convert the */
-	/* checksum to ascii (3 digitas/chars) and compare each one */
-	/* of these digits/characters to the ones in the RxBuffer,	*/
-	/* positions nbytes, nbytes + 1 and nbytes +2. 				*/
+	unsigned int sum = 0 ;
 	
-	/* That is your work to do. In this example I just assume 	*/
-	/* that the checksum is always OK.							*/	
-	return 1;		
+	for(unsigned char* i = buf ; i < (buf+nbytes);i++ ){
+		sum += (unsigned int)(*i);
+	}
+	return (sum%256);		
 }
 
 /*
@@ -168,7 +165,18 @@ void getTxBuffer(unsigned char * buf, int * len)
 	if(txBufLen > 0) {
 		memcpy(buf,UARTTxBuffer,*len);
 	}		
-	return;
+	return 0;
 }
+/*
+*getTxBufferLen
+*/
+int getTxBufferLen(void){
+
+if (txBufLen <= UART_TX_SIZE )
+{
+	return;
+}else
+	return FULL_BUFF; // Size_error 
 
 
+}
