@@ -26,7 +26,9 @@
 
 /* Some defines */
 /* Other defines should be return codes of the functions */
-/* E.g. #define CMD_EMPTY_STRING -1                      */
+/* E.g. #define CMD_EMPTY_STRING -1    
+*/
+#define MAX_SIZE 20         ///< Maxium size of arrays Temp, Hum , CO2                  
 #define UART_RX_SIZE 20 	///< Maximum size of the RX buffer  
 #define UART_TX_SIZE 20 	///< Maximum size of the TX buffer 
 #define SOF_SYM '#'	        ///< Start of Frame Symbol
@@ -37,6 +39,7 @@
 #define CS_ERROR -3         ///< ERROR CODE: CS error detected (command not executed)
 #define WRONG_FORMAT -4     ///< ERROR CODE: The string format is wrong
 #define FULL_BUFF -5        ///< ERROR CODE: Full buffer
+#define NOT_EMPTY -6        ///< ERROR CODE: Buffer not empty
 
 
 /* Function prototypes */
