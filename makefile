@@ -19,9 +19,17 @@ build/main.o: src/main.c
 	$(CC) $(CFLAGS) -c src/main.c -o build/main.o 
 
 #gerar unity.o
-build/unity.o: src/unity.c src/unity.h src/unity_internals.h
-	$(CC) $(CFLAGS) -c src/unity.c -o build/unity.o 
+build/unity.o: unity/unity.c unity/unity.h unity/unity_internals.h
+	$(CC) $(CFLAGS) -c unity/unity.c -o build/unity.o 
 
+#gerar test.o
+build/test.o: test/test.c test/test.h
+	$(CC) $(CFLAGS) -c test/test.c -o build/test.o 
+
+#gerar UART.o
+build/UART.o: UART/UART.c UART/UART.h
+	$(CC) $(CFLAGS) -c UART/UART.c -o build/UART.o 
+	
 
 clean:
 	rm -f *.o $(DEFAULT_TARGET)

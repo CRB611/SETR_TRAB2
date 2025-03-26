@@ -1,16 +1,25 @@
-/* ******************************************************/
-/* SETR 23/24, Paulo Pedreiras                          */
-/*	Base code for Unit Testing                          */
-/*  	Simple example of command processor             */
-/*    	for smart sensor node with 3 sensors			*/
-/*     													*/
-/*	Code is just for illustrative effects. E.g. error 	*/ 
-/*		codes are "magic numbers" in the middle of the	*/
-/*    	code instead of being (defined) text literals, 	*/
-/* 		sensor data is not properly emulated, missing 	*/
-/* 		commands, Checksum not implemented, ...			*/
-/*														*/
-/* ******************************************************/
+/**
+ * \file cmdproc.h
+ * \brief This file contains all the structures and functions needed for the C module.
+ *
+ * This module processes commands received via UART, one character at a time. 
+ * The module is part of a smart sensor that reads:
+ * <ul>
+    <li>Temperature, from -50ºC to 60ºC;</li>
+    <li>Relative humidity, from 0% to 100%;</li>
+    <li>CO<sub>2</sub>, from 400 to 2000 ppm;</li>
+</ul>
+ * This file is based on the source file  given to us by professor Paulo Pedreiras. 
+ * 
+ * \author Simão Ribeiro
+ * \author Celina Brito
+ * \date 1/4/2025
+ * \bug There are no known bugs.
+ *
+ * \defgroup C Module
+ * \brief Functions and structures for the C module. 
+ *
+ */ 
 
 #ifndef CMD_PROC_H_
 #define CMD_PROC_H_
@@ -18,10 +27,10 @@
 /* Some defines */
 /* Other defines should be return codes of the functions */
 /* E.g. #define CMD_EMPTY_STRING -1                      */
-#define UART_RX_SIZE 20 	/* Maximum size of the RX buffer */ 
-#define UART_TX_SIZE 20 	/* Maximum size of the TX buffer */ 
-#define SOF_SYM '#'	        /* Start of Frame Symbol */
-#define EOF_SYM '!'          /* End of Frame Symbol */
+#define UART_RX_SIZE 20 	///< Maximum size of the RX buffer  
+#define UART_TX_SIZE 20 	///< Maximum size of the TX buffer 
+#define SOF_SYM '#'	        ///< Start of Frame Symbol
+#define EOF_SYM '!'         ///< End of Frame Symbol 
 
 /* Function prototypes */
 
@@ -34,6 +43,10 @@
 /* 		-3: if a CS error is detected (command not executed)    */
 /* 		-4: if string format is wrong                           */
 /* ************************************************************ */
+/**
+ * \brief Processes the commands 
+ * \return 
+ */
 int cmdProcessor(void);
 
 /* ******************************** */
