@@ -31,60 +31,61 @@
 #define UART_TX_SIZE 20 	///< Maximum size of the TX buffer 
 #define SOF_SYM '#'	        ///< Start of Frame Symbol
 #define EOF_SYM '!'         ///< End of Frame Symbol 
+#define OK 0                ///< Return when a function completes without errors
+#define EMPTY -1            ///< ERROR CODE: Empty string or incomplete command found
+#define INV_COMM -2         ///< ERROR CODE: Invalid command
+#define CS_ERROR -3         ///< ERROR CODE: CS error detected (command not executed)
+#define WRONG_FORMAT -4     ///< ERROR CODE: The string format is wrong
+#define FULL_BUFF -1        ///< ERROR CODE: Full buffer
 
 /* Function prototypes */
-
-/* ************************************************************ */
-/* Processes the chars in the RX buffer looking for commands 	*/
-/* Returns:                                                     */
-/*  	 0: if a valid command was found and executed           */
-/* 		-1: if empty string or incomplete command found         */
-/* 		-2: if an invalid command was found                     */
-/* 		-3: if a CS error is detected (command not executed)    */
-/* 		-4: if string format is wrong                           */
-/* ************************************************************ */
 /**
- * \brief Processes the commands 
- * \return 
+ * \brief Processes the chars in the RX buffer looking for commands 
+ * \return OK if a valid command was found and executed
+ * \return EMPTY if a empty string or incomplete command was found
+ * \return INV_COMM if a invalid command was found 
+ * \return CS_ERROR if a CS error is detected (command not executed) 
+ * \return WRONG_FORMAT if the string format is wrong
  */
 int cmdProcessor(void);
 
-/* ******************************** */
-/* Adds a char to the RX buffer 	*/
-/* I.e., the reception of commands 	*/
-/* Returns: 				        */
-/*  	 0: if success 		        */
-/* 		-1: if buffer full	 	    */
-/* ******************************** */
+/**
+ * \brief Adds a char to the reception buffer
+ * \return OK if success
+ * \return FULL_BUFF if the buffer is full
+ */
 int rxChar(unsigned char car);
 
-/* ************************************ */
-/* Adds a char to the TX buffer 		*/
-/* I.e., the tranmsisison of answers 	*/
-/* Returns: 				        	*/
-/*  	 0: if success 		        	*/
-/* 		-1: if buffer full	 	    	*/
-/* ************************************ */
+/**
+ * \brief Adds a char to the transmission buffer
+ * \return OK if success
+ * \return FULL_BUFF if the buffer is full
+ */
 int txChar(unsigned char car);
 
-/* ************************* */
-/* Resets the RX buffer		 */  
-/* ************************* */
+ 
+/**
+ * \brief Resets the reception buffer.
+ */
 void resetRxBuffer(void);
 
-/* ************************* */
-/* Resets the TX buffer		 */  
-/* ************************* */
+/**
+ * \brief Resets the transmission buffer.
+ */
 void resetTxBuffer(void);
 
-/* ************************************************ */
-/* Return the data that would be sent by the sensor */  
-/* ************************************************ */
+/**
+ * \brief Returns the data that would be sent by the sensor.
+ * \param buf
+ * \param len
+ */
 void getTxBuffer(unsigned char * buf, int * len);
 
-/* ************************************************ */
-/* Computes the checksum of a given number of chars */
-/* ************************************************ */ 
+/**
+ * \brief Computes the checksum of a given number of chars.
+ * \param buf
+ * \param nbytes
+ */
 int calcChecksum(unsigned char * buf, int nbytes);
 
 #endif
