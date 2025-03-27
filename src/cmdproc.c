@@ -177,6 +177,40 @@ if (txBufLen <= UART_TX_SIZE )
 	return;
 }else
 	return FULL_BUFF; // Size_error 
+}
 
+char* num2char(int num){
 
+	char number[6],temp[6];
+	int i=1;
+
+	//checking if its a negative number
+	if (num < 0)
+	{
+		number[0]='-';		
+	}else{
+		number[0]='+';
+	}
+	
+	num=abs(num);
+
+	while (num >= 10)
+	{
+		number[i] = (char)(num % 10) + '0';
+		temp[i]=number[i];
+		i++;
+		num=num/10;
+	}
+	number[i]=(char)num+'0';
+	temp[i]=number[i];
+	
+
+	int count=i;
+	for (int k = 1; k <= count; k++)
+	{
+		number[k]=temp[i];
+		i--;	
+	}
+	
+	return number;
 }

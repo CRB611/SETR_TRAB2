@@ -2,7 +2,7 @@ BUILD_DIR=build
 DEFAULT_TARGET=$(BUILD_DIR)/main
 OBJECTS = $(BUILD_DIR)/cmdproc.o $(BUILD_DIR)/main.o
 
-CFLAGS = -g -Wall -O3
+CFLAGS =-Wall -Wfatal-errors -ggdb -pthread
 LDLIBS=
 CC=gcc
 
@@ -25,11 +25,6 @@ build/unity.o: unity/unity.c unity/unity.h unity/unity_internals.h
 #gerar test.o
 build/test.o: test/test.c test/test.h
 	$(CC) $(CFLAGS) -c test/test.c -o build/test.o 
-
-#gerar UART.o
-build/UART.o: UART/UART.c UART/UART.h
-	$(CC) $(CFLAGS) -c UART/UART.c -o build/UART.o 
-	
 
 clean:
 	rm -f *.o $(DEFAULT_TARGET)

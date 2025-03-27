@@ -95,4 +95,11 @@ int calcChecksum(unsigned char * buf, int nbytes);
  *  
  */
 int getTxBufferLen(void);
+
+/**
+ * \brief Converts an integer to a ASCII
+ * \param num the integer to be converted
+ * \return Returns the converted char array
+ */
+char* num2char(int num);
 #endif
