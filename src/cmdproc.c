@@ -130,27 +130,54 @@ int init(void){
 		return NOT_EMPTY;//Não vazio	
 	}
 }
-
+/*
+Get Temp
+*/
 int* get_temp(void){
 	if(sizeof(temp)==0){
 		return; //tmep vazio
 	}
 	return temp;
 }
+/*
+Get HUm
+*/
 int* get_hum(void){
 	return hum;
 }
+/*
+Get CO2
+*/
 int* get_co2(void){
 	return co2;
 }
+/*
+Get ALL (Temp,HUm,Co2)
+*/
 void get_all(){
 	get_temp();
 	get_hum();
 	get_co2();
-
-
 }
 
+/*
+Get Temp first 
+*/
+int getFirstTemp(void){
+	return temp[0];
+}
+/*
+Get Hum first
+*/
+int getFirstHum(void){
+	return hum[0];
+}
+/*
+Get CO2 first
+*/
+int getFirstco2(void){
+	return co2[0];
+}
 /* 
  * cmdProcessor
  */ 
