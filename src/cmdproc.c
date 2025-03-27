@@ -258,89 +258,14 @@ int cmdProcessor(void)
 	return -4;
 
 }
-<<<<<<< HEAD
 
-/* 
- * calcChecksum
- */ 
-int calcChecksum(unsigned char * buf, int nbytes) {
-	unsigned int sum = 0 ;
-	
-	for(unsigned char* i = buf ; i < (buf+nbytes);i++ ){
-		sum += (unsigned int)(*i);
-	}
-	return (sum%127);		
-}
 
-/*
- * rxChar
- */
-int rxChar(unsigned char car)
-{
-	/* If rxbuff not full add char to it */
-	if (rxBufLen < UART_RX_SIZE) {
-		UARTRxBuffer[rxBufLen] = car;
-		rxBufLen += 1;
-		return 0;		
-	}	
-	/* If cmd string full return error */
-	return -1;
-}
 
-/*
- * txChar
- */
-int txChar(unsigned char car)
-{
-	/* If rxbuff not full add char to it */
-	if (txBufLen < UART_TX_SIZE) {
-		UARTTxBuffer[txBufLen] = car;
-		txBufLen += 1;
-		return 0;		
-	}	
-	/* If cmd string full return error */
-	return -1;
-}
 
-/*
- * resetRxBuffer
- */
-void resetRxBuffer(void)
-{
-	rxBufLen = 0;		
-	return;
-}
 
-/*
- * resetTxBuffer
- */
-void resetTxBuffer(void)
-{
-	txBufLen = 0;		
-	return;
-}
 
-/*
- * getTxBuffer
- */
-void getTxBuffer(unsigned char * buf, int * len)
-{
-	*len = txBufLen;
-	if(txBufLen > 0) {
-		memcpy(buf,UARTTxBuffer,*len);
-	}		
-}
-/*
-*getTxBufferLen
-*/
-int getTxBufferLen(void){
 
-if (txBufLen <= UART_TX_SIZE )
-{
-	return txBufLen;
-}else
-	return FULL_BUFF; // Size_error 
-}
+
 
 char* num2char(int num,char type){
 
@@ -404,19 +329,6 @@ char* num2char(int num,char type){
 	}
 }
 
-int getCO2(void){
-	return 0;
-}
 
-int getHumidity(void){
-	return 0;
 
-}
 
-int getTemp(void){
-	return 0;
-
-}
-
-=======
->>>>>>> branch_simao
