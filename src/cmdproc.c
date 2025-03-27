@@ -14,10 +14,171 @@ static unsigned char rxBufLen = 0;
 
 static unsigned char UARTTxBuffer[UART_TX_SIZE];
 static unsigned char txBufLen = 0; 
-
- 
+static unsigned  index_hum; 
+static int hum[MAX_SIZE];
+static unsigned  index_temp; 
+static int temp[MAX_SIZE];
+static unsigned  index_co2; 
+static int co2[MAX_SIZE];
 /* Function implementation */
 
+
+/* 
+ * calcChecksum
+ */ 
+int calcChecksum(unsigned char * buf, int nbytes) {
+	unsigned int sum = 0 ;
+	
+	for(unsigned char* i = buf ; i < (buf+nbytes);i++ ){
+		sum += (unsigned int)(*i);
+	}
+	return (sum%256);		
+}
+
+/*
+ * rxChar
+ */
+int rxChar(unsigned char car)
+{
+	/* If rxbuff not full add char to it */
+	if (rxBufLen < UART_RX_SIZE) {
+		UARTRxBuffer[rxBufLen] = car;
+		rxBufLen += 1;
+		return 0;		
+	}	
+	/* If cmd string full return error */
+	return -1;
+}
+
+/*
+ * txChar
+ */
+int txChar(unsigned char car)
+{
+	/* If rxbuff not full add char to it */
+	if (txBufLen < UART_TX_SIZE) {
+		UARTTxBuffer[txBufLen] = car;
+		txBufLen += 1;
+		return 0;		
+	}	
+	/* If cmd string full return error */
+	return -1;
+}
+
+/*
+ * resetRxBuffer
+ */
+void resetRxBuffer(void)
+{
+	rxBufLen = 0;		
+	return;
+}
+
+/*
+ * resetTxBuffer
+ */
+void resetTxBuffer(void)
+{
+	txBufLen = 0;		
+	return;
+}
+
+/*
+ * getTxBuffer
+ */
+void getTxBuffer(unsigned char * buf, int * len)
+{
+	if(txBufLen==0){
+		return EMPTY;
+	}
+
+	*len = txBufLen;
+	if(txBufLen > 0) {
+		memcpy(buf,UARTTxBuffer,*len);
+	}		
+	return 0;
+}
+/*
+*getTxBufferLen
+*/
+int getTxBufferLen(void){
+
+if (txBufLen <= UART_TX_SIZE )
+{
+	return;
+}else
+	return FULL_BUFF; // Size_error 
+
+/*
+*Init function
+*/
+}
+int init(void){
+	index_temp=0;
+	index_co2=0;
+	index_hum=0;
+	for ( int i = 0; i <= MAX_SIZE; i++)
+	{
+		hum[i]=0;
+		temp[i]=0;
+		co2[i]=0;
+	}
+	resetRxBuffer();
+	resetTxBuffer();
+	if(txBufLen==0){
+		return EMPTY;//vazio
+	}else{
+		return NOT_EMPTY;//Não vazio	
+	}
+}
+/*
+Get Temp
+*/
+int* get_temp(void){
+	if(sizeof(temp)==0){
+		return; //tmep vazio
+	}
+	return temp;
+}
+/*
+Get HUm
+*/
+int* get_hum(void){
+	return hum;
+}
+/*
+Get CO2
+*/
+int* get_co2(void){
+	return co2;
+}
+/*
+Get ALL (Temp,HUm,Co2)
+*/
+void get_all(){
+	get_temp();
+	get_hum();
+	get_co2();
+}
+
+/*
+Get Temp first 
+*/
+int getFirstTemp(void){
+	return temp[0];
+}
+/*
+Get Hum first
+*/
+int getFirstHum(void){
+	return hum[0];
+}
+/*
+Get CO2 first
+*/
+int getFirstco2(void){
+	return co2[0];
+}
 /* 
  * cmdProcessor
  */ 
@@ -97,6 +258,7 @@ int cmdProcessor(void)
 	return -4;
 
 }
+<<<<<<< HEAD
 
 /* 
  * calcChecksum
@@ -256,3 +418,5 @@ int getTemp(void){
 
 }
 
+=======
+>>>>>>> branch_simao
