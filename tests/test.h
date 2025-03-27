@@ -21,18 +21,18 @@
 #ifndef UNITY_TEST_H_
 #define UNITY_TEST_H_
 
-void setUp(void);
+void setup(void);
  
 /**
   * \brief closes the unity testing
   */
-void tearDown(void);
+void teardown(void);
 
 /**
   * \brief tests the initialization of the module
   * \par 
   */
-void test_cmdproc_init(void);
+//void test_cmdproc_init(void);
 
 void test_command_A(void);
 

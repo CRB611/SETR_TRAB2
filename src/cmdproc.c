@@ -3,6 +3,7 @@
 /* ****************************** */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "cmdproc.h"
 
@@ -82,40 +83,6 @@ int cmdProcessor(void)
 				rxBufLen = 0;	
 				
 				return OK;
-			
-			case 'A':		
-				/* Command "A" detected.							*/
-				if(!(calcChecksum(&(UARTRxBuffer[i+1]),2))) {
-					return CHECKSUM_BAD;
-				}
-				
-				/* Check EOF */
-				if(UARTRxBuffer[i+6] != EOF_SYM) {
-					return WRONG_FORMAT;
-				}
-
-				int temp_int= getTemp();	
-				int Humid_int= getHumidity();
-				int co2_int=getCO2();
-
-				unsigned char *temp= num2char(temp_int,'t');
-				unsigned char *Humid= num2char(Humid_int,'a');
-				unsigned char *co2= num2char(co2_int,'a');
-				
-				unsigned char *message[]= {'a','t',temp,'h',Humid,'c',co2};
-
-				//calcChecksum(&message,2)
-
-				txChar('#');
-				txChar('a'); /* a is the reply to a 							*/	
-				txChar('t'); 
-				txChar('+'); /* This is the sensor reading. You should call a 	*/
-				txChar('2'); /*   function that emulates the reading of a 		*/
-				txChar('1'); /*   sensor value 	*/
-				txChar('1'); /* Checksum is 114 decimal in this case		*/
-				txChar('1'); /*   You should call a funcion that computes 	*/
-				txChar('4'); /*   the checksum for any command 				*/  
-				txChar('!');
 
 
 			default:
@@ -200,7 +167,6 @@ void getTxBuffer(unsigned char * buf, int * len)
 	if(txBufLen > 0) {
 		memcpy(buf,UARTTxBuffer,*len);
 	}		
-	return 0;
 }
 /*
 *getTxBufferLen
@@ -209,7 +175,7 @@ int getTxBufferLen(void){
 
 if (txBufLen <= UART_TX_SIZE )
 {
-	return;
+	return txBufLen;
 }else
 	return FULL_BUFF; // Size_error 
 }
