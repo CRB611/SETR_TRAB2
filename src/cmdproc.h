@@ -98,4 +98,56 @@ int calcChecksum(unsigned char * buf, int nbytes);
  *  
  */
 int getTxBufferLen(void);
+
+/**
+ * \brief Initialize the buffers and all the values arrays
+ *  
+ */
+
+int init(void);
+/**
+ * \brief Get the temperatura array
+ * \return The pointer for the temperature array
+ */
+int* get_temp(void);
+
+/**
+ * \brief Get the humidity array
+ * \return The pointer for the humidity array
+ */
+int* get_hum(void);
+
+/**
+ * \brief Get the CO2 array
+ * \return The pointer for the CO2 array
+ */
+int* get_co2(void);
+
+/**
+ * \brief Get the temp,hum,co2 arrays
+ * 
+ */
+void get_all(void);
+
+/**
+ * \brief Get the last temp value from array
+ * \return The last temperatura
+ * 
+ */
+int getFirstTemp(void);
+
+
+/**
+ * \brief Get the last humidity value from array
+ * \return The last humidity
+ */
+int getFirstHum(void);
+
+
+/**
+ * \brief Get the last CO2 value from array
+ * \return The last CO2
+ */
+int getFirstco2(void);
+
 #endif
