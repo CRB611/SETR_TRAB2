@@ -105,7 +105,7 @@ int calcChecksum(unsigned char * buf, int nbytes) {
 	for(unsigned char* i = buf ; i < (buf+nbytes);i++ ){
 		sum += (unsigned int)(*i);
 	}
-	return (sum%256);		
+	return (sum%127);		
 }
 
 /*

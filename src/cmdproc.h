@@ -102,4 +102,6 @@ int getTxBufferLen(void);
  * \return Returns the converted char array
  */
 char* num2char(int num);
+
+
 #endif
