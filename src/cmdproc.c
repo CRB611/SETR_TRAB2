@@ -86,7 +86,7 @@ void resetTxBuffer(void)
 /*
  * getTxBuffer
  */
-void getTxBuffer(unsigned char * buf, int * len)
+int getTxBuffer(unsigned char * buf, int * len)
 {
 	if(txBufLen==0){
 		return EMPTY;
@@ -105,7 +105,7 @@ int getTxBufferLen(void){
 
 if (txBufLen <= UART_TX_SIZE )
 {
-	return;
+	return txBufLen;
 }else
 	return FULL_BUFF; // Size_error 
 
@@ -135,9 +135,7 @@ int init(void){
 Get Temp
 */
 int* get_temp(void){
-	if(sizeof(temp)==0){
-		return; //tmep vazio
-	}
+
 	return temp;
 }
 /*
