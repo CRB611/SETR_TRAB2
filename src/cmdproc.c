@@ -27,7 +27,7 @@ int cmdProcessor(void)
 		
 	/* Detect empty cmd string */
 	if(rxBufLen == 0)
-		return -1; 
+		return EMPTY; 
 	
 	/* Find index of SOF */
 	for(i=0; i < rxBufLen; i++) {
@@ -50,17 +50,17 @@ int cmdProcessor(void)
 				/* Check sensor type */
 				sid = UARTRxBuffer[i+2];
 				if(sid != 't' && sid != 'h' && sid != 'c') {
-					return -2;
+					return NOT_SENSOR;
 				}
 				
 				/* Check checksum */
 				if(!(calcChecksum(&(UARTRxBuffer[i+1]),2))) {
-					return -3;
+					return CHECKSUM_BAD;
 				}
 				
 				/* Check EOF */
 				if(UARTRxBuffer[i+6] != EOF_SYM) {
-					return -4;
+					return WRONG_FORMAT;
 				}
 			
 				/* Command is (is it? ... ) valid. Produce answer and terminate */ 
@@ -81,11 +81,46 @@ int cmdProcessor(void)
 				/* resetting  will generate errors									*/
 				rxBufLen = 0;	
 				
-				return 0;
-								
+				return OK;
+			
+			case 'A':		
+				/* Command "A" detected.							*/
+				if(!(calcChecksum(&(UARTRxBuffer[i+1]),2))) {
+					return CHECKSUM_BAD;
+				}
+				
+				/* Check EOF */
+				if(UARTRxBuffer[i+6] != EOF_SYM) {
+					return WRONG_FORMAT;
+				}
+
+				int temp_int= getTemp();	
+				int Humid_int= getHumidity();
+				int co2_int=getCO2();
+
+				unsigned char *temp= num2char(temp_int,'t');
+				unsigned char *Humid= num2char(Humid_int,'a');
+				unsigned char *co2= num2char(co2_int,'a');
+				
+				unsigned char *message[]= {'a','t',temp,'h',Humid,'c',co2};
+
+				//calcChecksum(&message,2)
+
+				txChar('#');
+				txChar('a'); /* a is the reply to a 							*/	
+				txChar('t'); 
+				txChar('+'); /* This is the sensor reading. You should call a 	*/
+				txChar('2'); /*   function that emulates the reading of a 		*/
+				txChar('1'); /*   sensor value 	*/
+				txChar('1'); /* Checksum is 114 decimal in this case		*/
+				txChar('1'); /*   You should call a funcion that computes 	*/
+				txChar('4'); /*   the checksum for any command 				*/  
+				txChar('!');
+
+
 			default:
 				/* If code reaches this place, the command is not recognized */
-				return -2;				
+				return INV_COMM;				
 		}
 		
 		
@@ -179,38 +214,79 @@ if (txBufLen <= UART_TX_SIZE )
 	return FULL_BUFF; // Size_error 
 }
 
-char* num2char(int num){
+char* num2char(int num,char type){
 
 	char number[6],temp[6];
-	int i=1;
 
-	//checking if its a negative number
-	if (num < 0)
+	if (type == 't')
 	{
-		number[0]='-';		
-	}else{
-		number[0]='+';
-	}
 	
-	num=abs(num);
+		int i=1;
 
-	while (num >= 10)
-	{
-		number[i] = (char)(num % 10) + '0';
+		//checking if its a negative number
+		if (num < 0)
+		{
+			number[0]='-';		
+		}else{
+			number[0]='+';
+		}
+		
+		num=abs(num);
+
+		while (num >= 10)
+		{
+			number[i] = (char)(num % 10) + '0';
+			temp[i]=number[i];
+			i++;
+			num=num/10;
+		}
+		number[i]=(char)num+'0';
 		temp[i]=number[i];
-		i++;
-		num=num/10;
-	}
-	number[i]=(char)num+'0';
-	temp[i]=number[i];
-	
+		
 
-	int count=i;
-	for (int k = 1; k <= count; k++)
-	{
-		number[k]=temp[i];
-		i--;	
+		int count=i;
+		for (int k = 1; k <= count; k++)
+		{
+			number[k]=temp[i];
+			i--;	
+		}
+		
+		return number;
+	}else{
+		int i=0;
+
+		while (num >= 10)
+		{
+			number[i] = (char)(num % 10) + '0';
+			temp[i]=number[i];
+			i++;
+			num=num/10;
+		}
+		number[i]=(char)num+'0';
+		temp[i]=number[i];
+		
+		int count=i;
+		for (int k = 1; k <= count; k++)
+		{
+			number[k]=temp[i];
+			i--;	
+		}
+		
+		return number;
 	}
-	
-	return number;
 }
+
+int getCO2(void){
+	return 0;
+}
+
+int getHumidity(void){
+	return 0;
+
+}
+
+int getTemp(void){
+	return 0;
+
+}
+

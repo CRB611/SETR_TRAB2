@@ -24,6 +24,7 @@ void test_cmdproc_init(void)
 void test_command_A(void){
 	rxChar('#');	//start
 	rxChar('A');	//command
+	rxChar('0');	//checksum
 	rxChar('6');	//checksum
 	rxChar('5');	//checksum
 	rxChar('!');	//end
@@ -71,6 +72,7 @@ void test_command_P(void){
 void test_command_L(void){
 	rxChar('#');	//start
 	rxChar('L');	//command
+	rxChar('0');	//checksum
 	rxChar('7');	//checksum
 	rxChar('6');	//checksum
 	rxChar('!');	//end
@@ -82,6 +84,7 @@ void test_command_L(void){
 void test_command_R(void){
 	rxChar('#');	//start
 	rxChar('R');	//command
+	rxChar('0');	//checksum
 	rxChar('8');	//checksum
 	rxChar('2');	//checksum
 	rxChar('!');	//end
@@ -90,3 +93,13 @@ void test_command_R(void){
 
 }
 
+void test_wrong_checksum(void){
+	rxChar('#');	//start
+	rxChar('R');	//command
+	rxChar('0');	//checksum
+	rxChar('4');	//checksum
+	rxChar('2');	//checksum
+	rxChar('!');	//end
+
+	TEST_ASSERT_EQUAL_INT(-7,cmdProcessor());
+}

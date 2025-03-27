@@ -37,6 +37,8 @@
 #define CS_ERROR -3         ///< ERROR CODE: CS error detected (command not executed)
 #define WRONG_FORMAT -4     ///< ERROR CODE: The string format is wrong
 #define FULL_BUFF -5        ///< ERROR CODE: Full buffer
+#define NOT_SENSOR -6       ///< ERROR CODE: Wrong sensor type
+#define CHECKSUM_BAD -7     ///< ERROR CODE: The checksum didnt check out
 
 
 /* Function prototypes */
@@ -99,9 +101,16 @@ int getTxBufferLen(void);
 /**
  * \brief Converts an integer to a ASCII
  * \param num the integer to be converted
+ * \param type if its 't' the number comes with the +/- sign
  * \return Returns the converted char array
  */
-char* num2char(int num);
+char* num2char(int num, char type);
+
+int getCO2(void);
+
+int getHumidity(void);
+
+int getTemp(void);
 
 
 #endif
