@@ -465,110 +465,109 @@ int cmdProcessor(void)
 				return END;
 			case 'L':
 						
-			if (UARTRxBuffer[i+8] != EOF_SYM) {
+				if (UARTRxBuffer[i+8] != EOF_SYM) {
+					erraseRxBuff(rxBufLen);
+					return EOF_ERROR;
+				}
+				
+				int chk = calcChecksum(&UARTRxBuffer[i+1], 1); // só 'L'
+				int chk_recv = char2num(&UARTRxBuffer[i+5], 3); // três dígitos ASCII
+
+				if (chk != chk_recv) {
+					return CHECKSUM_BAD;
+				}
+				// Envio de Temperatura ,20 valores visto que o array so tem 20 posicoes
+				for (i = 0; i < index_temp; i++) {
+					txChar('t');
+					unsigned char temp_ascii[4];
+					num2char(temp_ascii, temp[i], 't');
+					txChar(temp_ascii[0]); // '+' ou '-'
+					txChar(temp_ascii[1]);
+					txChar(temp_ascii[2]);
+					txChar(temp_ascii[3]);
+				}	
+
+				// Envio de Humidade ,20 valores visto que o array so tem 20 posicoes
+				for (i = 0; i < index_hum; i++) {
+					txChar('h');
+					unsigned char hum_ascii[4];
+					num2char(hum_ascii, hum[i], 'h');
+					txChar(hum_ascii[0]); // '+' ou '-'
+					txChar(hum_ascii[1]);
+					txChar(hum_ascii[2]);
+					txChar(hum_ascii[3]);
+				}	
+				
+
+				// Envio de CO2 ,20 valores visto que o array so tem 20 posicoes
+				for (i = 0; i < index_co2; i++) {
+					txChar('h');
+					unsigned char CO2_ascii[4];
+					num2char(CO2_ascii, co2[i], 'h');
+					txChar(CO2_ascii[0]); // '+' ou '-'
+					txChar(CO2_ascii[1]);
+					txChar(CO2_ascii[2]);
+					txChar(CO2_ascii[3]);
+				}	
+
 				erraseRxBuff(rxBufLen);
-				return EOF_ERROR;
-			}
-			
-			int chk = calcChecksum(&UARTRxBuffer[i+1], 1); // só 'L'
-			int chk_recv = char2num(&UARTRxBuffer[i+5], 3); // três dígitos ASCII
 
-			if (chk != chk_recv) {
-				return CHECKSUM_BAD;
-			}
-			// Envio de Temperatura ,20 valores visto que o array so tem 20 posicoes
-			for (i = 0; i < index_temp; i++) {
-				txChar('t');
-				unsigned char temp_ascii[4];
-				num2char(temp_ascii, temp[i], 't');
-				txChar(temp_ascii[0]); // '+' ou '-'
-				txChar(temp_ascii[1]);
-				txChar(temp_ascii[2]);
-				txChar(temp_ascii[3]);
-			}	
-
-			// Envio de Humidade ,20 valores visto que o array so tem 20 posicoes
-			for (i = 0; i < index_hum; i++) {
-				txChar('h');
-				unsigned char hum_ascii[4];
-				num2char(hum_ascii, hum[i], 'h');
-				txChar(hum_ascii[0]); // '+' ou '-'
-				txChar(hum_ascii[1]);
-				txChar(hum_ascii[2]);
-				txChar(hum_ascii[3]);
-			}	
-			
-
-			// Envio de CO2 ,20 valores visto que o array so tem 20 posicoes
-			for (i = 0; i < index_co2; i++) {
-				txChar('h');
-				unsigned char CO2_ascii[4];
-				num2char(CO2_ascii, co2[i], 'h');
-				txChar(CO2_ascii[0]); // '+' ou '-'
-				txChar(CO2_ascii[1]);
-				txChar(CO2_ascii[2]);
-				txChar(CO2_ascii[3]);
-			}	
-
-			erraseRxBuff(rxBufLen);
-
-			return END;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-				/* Command is (is it? ... ) valid. Produce answer and terminate */ 
-				txChar('#');
-				txChar('p'); /* p is the reply to P 							*/	
-				txChar('t'); /* t indicate that it is a temperature 			*/
-				txChar('+'); /* This is the sensor reading. You should call a 	*/
-				txChar('2'); /*   function that emulates the reading of a 		*/
-				txChar('1'); /*   sensor value 	*/
-				txChar('1'); /* Checksum is 114 decimal in this case		*/
-				txChar('1'); /*   You should call a funcion that computes 	*/
-				txChar('4'); /*   the checksum for any command 				*/  
-				txChar('!');
+				return END;
+				case 'R': {
+					// 1. Verifica EOF
+					if (UARTRxBuffer[i+8] != EOF_SYM) {
+						erraseRxBuff(rxBufLen);
+						return EOF_ERROR;
+					}
 				
-				/* Here you should remove the characters that are part of the 		*/
-				/* command from the RX buffer. I'm just resetting it, which is not 	*/
-				/* a good solution, as a new command could be in progress and		*/
-				/* resetting  will generate errors									*/
-				rxBufLen = 0;	
+					// 2. Verifica checksum
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 1);
+					int chk_recv = char2num(&UARTRxBuffer[i+5], 3);
+					if (chk != chk_recv)
+						return CHECKSUM_BAD;
 				
-				return OK;
+					// 3. Reset aos índices
+					index_temp = 0;
+					index_hum = 0;
+					index_co2 = 0;
+				
+					// 4. Limpar os arrays
+					for (int i = 0; i < MAX_SIZE; i++) {
+						temp[i] = 0;
+						hum[i] = 0;
+						co2[i] = 0;
+					}
+				
+					// 5. Ecoa a mensagem original
+					for (int i = 0; i < rxBufLen; i++)
+						txChar(UARTRxBuffer[i]);
+				
+					// 6. Envia o checksum
+					unsigned char chk_ascii[3];
+					num2char(chk_ascii, chk, 'c'); // 3 dígitos ASCII
+					txChar(chk_ascii[0]);
+					txChar(chk_ascii[1]);
+					txChar(chk_ascii[2]);
+				
+					// 7. Limpa e termina
+					erraseRxBuff(rxBufLen);
+					return END;
+				}
+				
+				
+
 
 
 			default:
-				/* If code reaches this place, the command is not recognized */
+				erraseRxBuff(rxBufLen);
 				return INV_COMM;				
 		}
 		
 		
-	}
+	}else
 	
 	/* Cmd string not null and SOF not found */
-	return -4;
+	return FATAL_ERROR;
 
 }
 

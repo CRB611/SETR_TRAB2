@@ -45,6 +45,7 @@
  #define NOT_EMPTY -8        ///< ERROR CODE: Buffer not empty
  #define END -9              ///< End of funciton
  #define VALUES_ERROR -11    ///< Value error comand
+ #define FATAL_ERROR -12
  
  /* Function prototypes */
  /**
