@@ -385,7 +385,68 @@ int cmdProcessor(void)
 					erraseRxBuff(rxBufLen);
 					return INV_COMM;
 				}
-			
+			case 'A':
+				int T,H,C;
+				if (UARTRxBuffer[i+19] != EOF_SYM)
+				{
+					erraseRxBuff(rxBufLen);
+					return EOF_ERROR;
+				}
+
+				int chk = calcChecksum(&UARTRxBuffer[i+1], 15);     // de 'A' até ao último dígito do CO₂
+				int chk_recv = char2num(&UARTRxBuffer[i+16], 3);     // posições 16, 17, 18 (ASCII)
+				
+				if (chk != chk_recv) {
+					return CHECKSUM_BAD;
+				}
+
+				sid = UARTRxBuffer[i+2];
+				while (sid != '!')
+				{
+					if (sid == 't')
+					{
+						T=10*((sid+2)-'0')+(sid+3)-'0';
+					}
+					
+				}
+				
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				/* Command is (is it? ... ) valid. Produce answer and terminate */ 
 				txChar('#');
 				txChar('p'); /* p is the reply to P 							*/	
