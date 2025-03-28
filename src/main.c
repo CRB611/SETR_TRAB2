@@ -24,9 +24,17 @@ int main(void)
 	UNITY_BEGIN();
 
     RUN_TEST(teste_txchar);
-    //RUN_TEST(test_command_P);
-    //RUN_TEST(test_command_L);
-    //RUN_TEST(test_command_R);
+    
+    RUN_TEST(test_cmdproc_init);
+    RUN_TEST(test_command_A);
+    RUN_TEST(test_command_P);
+    RUN_TEST(test_command_L);
+    RUN_TEST(test_command_R);
+    RUN_TEST(test_wrong_checksum);
+
+    RUN_TEST(test_num2char);
+    RUN_TEST(test_char2num);
+      
 
 	tearDown();
 

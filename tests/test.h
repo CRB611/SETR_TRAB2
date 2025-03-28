@@ -35,7 +35,7 @@ void teardown(void);
   * \brief tests the initialization of the module
   * \par 
   */
-//void test_cmdproc_init(void);
+void test_cmdproc_init(void);
 
 /**
  * \brief Tests the command 'A' using UNITY
@@ -57,9 +57,15 @@ void test_command_L(void);
  */
 void test_command_R(void);
 
+void test_wrong_checksum(void);
+
 /**
  * \brief Performs a test for the txchar function using UNITY
  */
 void teste_txchar(void);
+
+void test_num2char(void);
+
+void test_char2num(void);
 
 #endif

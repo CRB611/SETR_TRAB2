@@ -103,12 +103,16 @@
  
  /**
   * \brief Converts an integer to a ASCII
+  * \param ascii pointer to where the converted chars will be stored
   * \param num the integer to be converted
-  * \param type if its 't' the number comes with the +/- sign
+  * \param type 't' for temperature, 'h' for humidity, 'c' for c02
   * \return Returns the converted char array
   */
- char* num2char(int num, char type);
+void num2char(unsigned char *ascii, int num, char type);
  
+unsigned int char2num(unsigned char ascii [], int length);
+
+
  /**
   * \brief Initialize the buffers and all the values arrays
   *  
