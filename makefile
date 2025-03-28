@@ -7,7 +7,7 @@ TARGET = main
 
 all: $(TARGET)
 
-main: build/main.o build/cmdproc.o build/test.o build/unity.o
+main: build/main.o build/cmdproc.o build/teste.o build/unity.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ 
 
 build/main.o: src/main.c
@@ -16,7 +16,7 @@ build/main.o: src/main.c
 build/cmdproc.o: src/cmdproc.c src/cmdproc.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-build/test.o: tests/test.c tests/test.h 
+build/teste.o: src/teste.c src/teste.h 
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 build/unity.o: unity/unity.c unity/unity.h unity/unity_internals.h 

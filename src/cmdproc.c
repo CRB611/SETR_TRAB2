@@ -59,10 +59,10 @@ int txChar(unsigned char car)
 	if (txBufLen < UART_TX_SIZE) {
 		UARTTxBuffer[txBufLen] = car;
 		txBufLen += 1;
-		return 0;		
+		return END;		
 	}	
 	/* If cmd string full return error */
-	return -1;
+	return FULL_BUFF;
 }
 
 /*

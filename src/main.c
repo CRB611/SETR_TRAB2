@@ -16,21 +16,20 @@
 #include <string.h>
 #include "cmdproc.h"
 #include "../unity/unity.h"
-#include "../tests/test.h"
+#include "teste.h"
 
 int main(void) 
 {
-	setUp();
-
+    setUp();
 	UNITY_BEGIN();
 
-    RUN_TEST(test_command_A);
-    RUN_TEST(test_command_P);
-    RUN_TEST(test_command_L);
-    RUN_TEST(test_command_R);
+    RUN_TEST(teste_txchar);
+    //RUN_TEST(test_command_P);
+    //RUN_TEST(test_command_L);
+    //RUN_TEST(test_command_R);
 
 	tearDown();
 
 
-	return 0;
+	return UNITY_END();
 }

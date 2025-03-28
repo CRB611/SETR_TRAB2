@@ -18,6 +18,18 @@
 #include "../unity/unity.h"
 #include "teste.h"
 
+void setUp(void){
+
+}
+
+void tearDown(void){
+
+}
+
+
+
+
+//Teste TX
 void teste_txchar(void){
 	unsigned char txBuffer[UART_TX_SIZE];
 	unsigned char expectBuffer[UART_TX_SIZE];
@@ -28,16 +40,17 @@ for (int i = 0; i < UART_TX_SIZE; i++)
 	int dummy = txChar('8');
 	if (i < UART_TX_SIZE)
 	{
-		TEST_ASSERT_EQUAL_INT(0,dummy);
+		TEST_ASSERT_EQUAL_INT(END,dummy);
 
 		expectBuffer[i]='8';
 	}else{
 
-		TEST_ASSERT_EQUAL_INT(-1,dummy);
+		TEST_ASSERT_EQUAL_INT(FULL_BUFF,dummy);
 	}
 	
 }
-getTxBuffer(txBuffer,getTxBufferLen());
+int len = getTxBufferLen(); // getTxBufferLen() devolve um int
+getTxBuffer(txBuffer, &len); // &len é um int*
 TEST_ASSERT_EQUAL_STRING_LEN(expectBuffer,txBuffer,UART_TX_SIZE);
 
 resetTxBuffer();
