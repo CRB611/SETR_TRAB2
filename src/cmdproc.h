@@ -86,6 +86,9 @@
   * \param len
   */
  int getTxBuffer(unsigned char * buf, int * len);
+
+ int getRxBuffer(unsigned char * buf, int * len);
+ 
  
  /**
   * \brief Computes the checksum of a given number of chars.
@@ -100,7 +103,10 @@
   *  
   */
  int getTxBufferLen(void);
- 
+
+ int getRxBufferLen(void);
+
+ int clearRXBuffer(unsigned char * buf, int * len);
  /**
   * \brief Converts an integer to a ASCII
   * \param ascii pointer to where the converted chars will be stored

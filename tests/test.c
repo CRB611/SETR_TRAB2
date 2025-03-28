@@ -5,6 +5,7 @@
 
 void setUp(void)
 {
+	init();
 	return;
 }
 void tearDown(void)
@@ -129,6 +130,35 @@ void teste_txchar(void){
 	TEST_ASSERT_EQUAL_INT(0,getTxBufferLen());
 }
 
+void teste_rxchar(void){
+	unsigned char rxBuffer[UART_RX_SIZE];
+	unsigned char expectBuffer[UART_RX_SIZE];
+
+
+	for (int i = 0; i < UART_RX_SIZE; i++)
+	{
+		int dummy = rxChar('8');
+		if (i < UART_RX_SIZE)
+		{
+			TEST_ASSERT_EQUAL_INT(OK,dummy);
+
+			expectBuffer[i]='8';
+		}else{
+
+			TEST_ASSERT_EQUAL_INT(FULL_BUFF,dummy);
+		}
+		
+	}
+	int len = getRxBufferLen(); // getTxBufferLen() devolve um int
+	getRxBuffer(rxBuffer, &len); // &len é um int*
+	TEST_ASSERT_EQUAL_STRING_LEN(expectBuffer,rxBuffer,UART_TX_SIZE);
+
+	resetRxBuffer();
+
+	TEST_ASSERT_EQUAL_INT(0,getRxBufferLen());
+}
+
+
 void test_num2char(void){
 	
 	int a=123, b=-34;
@@ -163,3 +193,29 @@ void test_char2num(void){
 	TEST_ASSERT_EQUAL_INT(123,numberint);
 
 }
+
+
+void test_rbuff(void){
+
+	TEST_ASSERT_EQUAL_INT(0,getRxBufferLen());
+
+	rxChar('f');
+	rxChar('s');
+	rxChar('d');
+
+	TEST_ASSERT_EQUAL_INT(3,getRxBufferLen());
+
+}	
+
+
+void test_tbuff(void){
+
+	TEST_ASSERT_EQUAL_INT(0,getTxBufferLen());
+
+	txChar('f');
+	txChar('s');
+	txChar('d');
+
+	TEST_ASSERT_EQUAL_INT(3,getTxBufferLen());
+
+}	

@@ -64,8 +64,13 @@ void test_wrong_checksum(void);
  */
 void teste_txchar(void);
 
+void teste_rxchar(void);
+
 void test_num2char(void);
 
 void test_char2num(void);
 
+void test_rbuff(void);
+
+void test_tbuff(void);
 #endif

@@ -23,18 +23,28 @@ int main(void)
     setUp();
 	UNITY_BEGIN();
 
-    RUN_TEST(teste_txchar);
     
+    printf("\n---Test Commands---\n");
     RUN_TEST(test_cmdproc_init);
     RUN_TEST(test_command_A);
     RUN_TEST(test_command_P);
     RUN_TEST(test_command_L);
     RUN_TEST(test_command_R);
+    
+    printf("\n---Test checksum---\n");
     RUN_TEST(test_wrong_checksum);
 
+    printf("\n---Test convertions---\n");
     RUN_TEST(test_num2char);
     RUN_TEST(test_char2num);
-      
+
+    printf("\n---Test Buffers---\n");
+    RUN_TEST(test_rbuff);
+    RUN_TEST(test_tbuff);
+     
+    RUN_TEST(teste_txchar);
+    RUN_TEST(teste_rxchar);
+    
 
 	tearDown();
 

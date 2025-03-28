@@ -98,6 +98,19 @@ int getTxBuffer(unsigned char * buf, int * len)
 	}		
 	return 0;
 }
+
+int getRxBuffer(unsigned char * buf, int * len)
+{
+	if(rxBufLen==0){
+		return EMPTY;
+	}
+
+	*len = rxBufLen;
+	if(rxBufLen > 0) {
+		memcpy(buf,UARTRxBuffer,*len);
+	}		
+	return 0;
+}
 /*
 *getTxBufferLen
 */
@@ -108,11 +121,25 @@ if (txBufLen <= UART_TX_SIZE )
 	return txBufLen;
 }else
 	return FULL_BUFF; // Size_error 
+}
+
+
+int clearRXBuffer(int * len){
+	return OK;
+}
+
+int getRxBufferLen(void){
+
+	if (rxBufLen <= UART_RX_SIZE )
+	{
+		return rxBufLen;
+	}else
+		return FULL_BUFF; // Size_error 
+	}
 
 /*
 *Init function
 */
-}
 int init(void){
 	index_temp=0;
 	index_co2=0;
