@@ -463,11 +463,56 @@ int cmdProcessor(void)
 
 				erraseRxBuff(rxBufLen);
 				return END;
+			case 'L':
+						
+			if (UARTRxBuffer[i+8] != EOF_SYM) {
+				erraseRxBuff(rxBufLen);
+				return EOF_ERROR;
+			}
+			
+			int chk = calcChecksum(&UARTRxBuffer[i+1], 1); // só 'L'
+			int chk_recv = char2num(&UARTRxBuffer[i+5], 3); // três dígitos ASCII
 
+			if (chk != chk_recv) {
+				return CHECKSUM_BAD;
+			}
+			// Envio de Temperatura ,20 valores visto que o array so tem 20 posicoes
+			for (i = 0; i < index_temp; i++) {
+				txChar('t');
+				unsigned char temp_ascii[4];
+				num2char(temp_ascii, temp[i], 't');
+				txChar(temp_ascii[0]); // '+' ou '-'
+				txChar(temp_ascii[1]);
+				txChar(temp_ascii[2]);
+				txChar(temp_ascii[3]);
+			}	
 
+			// Envio de Humidade ,20 valores visto que o array so tem 20 posicoes
+			for (i = 0; i < index_hum; i++) {
+				txChar('h');
+				unsigned char hum_ascii[4];
+				num2char(hum_ascii, hum[i], 'h');
+				txChar(hum_ascii[0]); // '+' ou '-'
+				txChar(hum_ascii[1]);
+				txChar(hum_ascii[2]);
+				txChar(hum_ascii[3]);
+			}	
+			
 
+			// Envio de CO2 ,20 valores visto que o array so tem 20 posicoes
+			for (i = 0; i < index_co2; i++) {
+				txChar('h');
+				unsigned char CO2_ascii[4];
+				num2char(CO2_ascii, co2[i], 'h');
+				txChar(CO2_ascii[0]); // '+' ou '-'
+				txChar(CO2_ascii[1]);
+				txChar(CO2_ascii[2]);
+				txChar(CO2_ascii[3]);
+			}	
 
+			erraseRxBuff(rxBufLen);
 
+			return END;
 
 
 
