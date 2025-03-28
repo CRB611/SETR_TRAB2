@@ -29,7 +29,17 @@ void test_command_A(void){
 	rxChar('!');	//end
 
 	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+}
 
+void test_nonexistent_cmd(void){
+	rxChar('#');	//start
+	rxChar('C');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+
+	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
 }
 
 void test_command_P(void){
@@ -207,7 +217,7 @@ void test_addValue(void){
 }
 
 void test_rbuff(void){
-
+	
 	TEST_ASSERT_EQUAL_INT(0,getRxBufferLen());
 
 	rxChar('f');
@@ -215,7 +225,6 @@ void test_rbuff(void){
 	rxChar('d');
 
 	TEST_ASSERT_EQUAL_INT(3,getRxBufferLen());
-
 }	
 
 

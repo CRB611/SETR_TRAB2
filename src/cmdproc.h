@@ -1,16 +1,19 @@
-
 /**
  * \file cmdproc.h
  * \brief This file contains all the structures and functions needed for the C module.
  *
- * This module processes commands received via UART, one character at a time. 
+ *  This module processes commands received via UART, one character at a time. 
  * The module is part of a smart sensor that reads:
  * <ul>
     <li>Temperature, from -50ºC to 60ºC;</li>
     <li>Relative humidity, from 0% to 100%;</li>
     <li>CO<sub>2</sub>, from 400 to 2000 ppm;</li>
 </ul>
- * This file is based on the source file  given to us by professor Paulo Pedreiras. 
+ *  In this file there are functions to initialize the module, to manage the transmission and reception buffers, 
+ * to get the information from the sensors and to do the necessary conversions to process the ASCII messages.
+ *  This file also has some functions required to emulate the UART.
+ *  
+ * This file is based on the source file given to us by professor Paulo Pedreiras. 
  * 
  * \author Simão Ribeiro
  * \author Celina Brito
@@ -43,9 +46,9 @@
  #define NOT_SENSOR -6       ///< ERROR CODE: Wrong sensor type
  #define CHECKSUM_BAD -7     ///< ERROR CODE: The checksum didnt check out
  #define NOT_EMPTY -8        ///< ERROR CODE: Buffer not empty
- #define END -9              ///< End of funciton
+ #define END -9              ///< End of function
  #define VALUES_ERROR -11    ///< Value error comand
- #define FATAL_ERROR -12
+ #define FATAL_ERROR -12     ///< ERROR CODE: Fatal_Error
  
  /* Function prototypes */
  /**
@@ -84,32 +87,48 @@
  void resetTxBuffer(void);
  
  /**
-  * \brief Returns the data that would be sent by the sensor.
-  * \param buf
-  * \param len
+  * \brief Returns the data that is in the transmission buffer.
+  * \param buf pointer to the buffer
+  * \param len  pointer to the buffer length
   */
  int getTxBuffer(unsigned char * buf, int * len);
 
+ /**
+  * \brief Returns the data that is in the reception buffer.
+  * \param buf pointer to the buffer
+  * \param len  pointer to the buffer length
+  */
  int getRxBuffer(unsigned char * buf, int * len);
  
  
  /**
   * \brief Computes the checksum of a given number of chars.
-  * \param buf
-  * \param nbytes
+  * \param buf pointer to the buffer
+  * \param nbytes number of bytes to check
   */
  int calcChecksum(unsigned char * buf, int nbytes);
  
  /**
-  * \brief Checks the state of the TX_BUFF
-  * \return Returns FULL_BUFF if the buffer is full
+  * \brief Checks the length of the TX_BUFF
+  * \return Returns FULL_BUFF if the buffer is full and the length otherwise
   *  
   */
  int getTxBufferLen(void);
 
+ /**
+  * \brief Checks the length of the RX_BUFF
+  * \return Returns FULL_BUFF if the buffer is full and the length otherwise
+  *  
+  */
  int getRxBufferLen(void);
 
- int clearRXBuffer(int * len);
+/**
+  * \brief Clears the reception buffer
+  * \param len Dimention of the actual buffer
+  *  
+  */
+ void clearRXBuffer(int len);
+
  /**
   * \brief Converts an integer to a ASCII
   * \param array pointer to where the converted chars will be stored
@@ -128,13 +147,13 @@ unsigned int char2num(unsigned char ascii [], int length);
 
 
  /**
-  * \brief Initialize the buffers and all the values arrays
+  * \brief Initializes the buffers and all the values arrays
   *  
   */
- 
  int init(void);
+
  /**
-  * \brief Get the temperatura array
+  * \brief Get the temperature array
   * \return The pointer for the temperature array
   */
  int* get_temp(void);
@@ -156,25 +175,40 @@ unsigned int char2num(unsigned char ascii [], int length);
   * 
   */
  void get_all(void);
+
  /**
-  * \brief Get last temp
+  * \brief Get last temp from the array
   */
  int getFirstTemp(void);
+
  /**
-  * \brief Get last hum
+  * \brief Get last hum from the array
   */
  int getFirstHum(void);
+
  /**
-  * \brief Get last co2 
+  * \brief Get last co2 from the array
   */
  int getFirstco2(void);
  
  /**
- * \brief Add a value to the begining of the array by shifting the other elements.
+ * \brief Adds a value to the begining of the array by shifting the other elements.
  * \param arr Pointer to the array.
  * \param size Pointer to the actual size of the array.
  * \param value The value to be added.
  */
 void addValue(int *array, unsigned int *size, int value);
+
+/**
+ * \brief Erases the reception buffer.
+ * \param len Current length of the buffer.
+ */
+void eraseRxBuff(int len);
+
+/**
+ * \brief Erases the transmission buffer.
+ * \param len Current length of the buffer.
+ */
+void eraseTxBuff(int len);
  #endif
  

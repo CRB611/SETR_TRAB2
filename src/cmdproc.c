@@ -124,8 +124,15 @@ if (txBufLen <= UART_TX_SIZE )
 }
 
 
-int clearRXBuffer(int * len){
-	return OK;
+void clearRXBuffer(int len){
+	//taking the data out of the buffer
+	memmove(UARTRxBuffer ,UARTRxBuffer + len, rxBufLen - len);
+	
+	//reseting the length
+	rxBufLen -= len;
+
+	//setting the 1st "character" as "\0"
+	UARTTxBuffer[rxBufLen]='\0';
 }
 
 int getRxBufferLen(void){
@@ -212,26 +219,20 @@ int getFirstco2(void){
 /*
 Errase RX BUFF
 */
-void erraseRxBuff(int len){
+void eraseRxBuff(int len){
 
-	memmove(UARTRxBuffer,UARTRxBuffer+len,UARTRxBuffer-len);
+	memmove(UARTRxBuffer,UARTRxBuffer+len,rxBufLen-len);
 	rxBufLen-=len;
 	UARTRxBuffer[rxBufLen] = '\0';
-
-
-
 }
 /*
 Errase TX BUFF
 */
-void erraseTxBuff(int len){
+void eraseTxBuff(int len){
 
-	memmove(UARTTxBuffer,UARTTxBuffer+len,UARTTxBuffer-len);
+	memmove(UARTTxBuffer,UARTTxBuffer+len,rxBufLen-len);
 	txBufLen-=len;
 	UARTTxBuffer[txBufLen] = '\0';
-
-
-
 }
 
 
@@ -240,7 +241,7 @@ void erraseTxBuff(int len){
  */ 
 int cmdProcessor(void)
 {
-	int i;
+	unsigned int i;
 	unsigned char sid;
 		
 	/* Detect empty cmd string */
@@ -259,7 +260,8 @@ int cmdProcessor(void)
 		
 		switch(UARTRxBuffer[i+1]) { 
 			
-			case 'P':		
+			case 'P':	
+			{	
 				/* Command "P" detected.							*/
 				/* Follows one DATA byte that specifies the sensor	*/ 
 				/* to read. I assume 't','h','c' for temp., humid. 	*/
@@ -276,7 +278,7 @@ int cmdProcessor(void)
 				if ( sid =='t')
 				{
 					if(UARTRxBuffer[i+9] != EOF_SYM){
-						erraseRxBuff(rxBufLen);
+						eraseRxBuff(rxBufLen);
 						return EOF_ERROR;
 
 					}
@@ -300,7 +302,7 @@ int cmdProcessor(void)
 
 					if (c_n>60 || c_n<-50)
 					{
-						erraseRxBuff(rxBufLen);
+						eraseRxBuff(rxBufLen);
 						return VALUES_ERROR;
 					}
 					
@@ -311,14 +313,14 @@ int cmdProcessor(void)
 
 					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
 
-					erraseRxBuff(rxBufLen);
+					eraseRxBuff(rxBufLen);
 					return END;
 
 				}
 				else if(sid=='h'){
 
 					if(UARTRxBuffer[i+10] != EOF_SYM){
-						erraseRxBuff(rxBufLen);
+						eraseRxBuff(rxBufLen);
 						return EOF_ERROR;
 
 					}
@@ -335,7 +337,7 @@ int cmdProcessor(void)
 
 					if (c_n>100 || c_n<0)
 					{
-						erraseRxBuff(rxBufLen);
+						eraseRxBuff(rxBufLen);
 						return VALUES_ERROR;
 					}
 
@@ -346,12 +348,12 @@ int cmdProcessor(void)
 
 					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
 
-					erraseRxBuff(rxBufLen);
+					eraseRxBuff(rxBufLen);
 					return END;
 				}
 				else if (sid == 'c') {
 					if(UARTRxBuffer[i+12] != EOF_SYM){
-						erraseRxBuff(rxBufLen);
+						eraseRxBuff(rxBufLen);
 						return EOF_ERROR;
 					}
 				
@@ -366,7 +368,7 @@ int cmdProcessor(void)
 
 				
 					if (c_n < 400 || c_n > 20000) {
-						erraseRxBuff(rxBufLen);
+						eraseRxBuff(rxBufLen);
 						return VALUES_ERROR;
 					}
 				
@@ -377,22 +379,36 @@ int cmdProcessor(void)
 					}
 
 					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
-					erraseRxBuff(rxBufLen);
+					eraseRxBuff(rxBufLen);
 					return END;
 
 				}
 				else{
-					erraseRxBuff(rxBufLen);
+					eraseRxBuff(rxBufLen);
 					return INV_COMM;
 				}
+			}
 			case 'A':
+			{
 				int T, H, C;
 			
 				// Verifica se a mensagem termina corretamente
-				if (UARTRxBuffer[i+19] != EOF_SYM) {
-					erraseRxBuff(rxBufLen);
+				/*if (UARTRxBuffer[i+19] != EOF_SYM) {
+					eraseRxBuff(rxBufLen);
 					return EOF_ERROR;
+				}*/
+				for (int k = 0; k < 20; k++)
+				{
+					if (UARTRxBuffer[k] == EOF_SYM)
+					{
+						break;
+					}else{
+						eraseRxBuff(rxBufLen);
+					return EOF_ERROR;
+					}
+					
 				}
+				
 			
 				// Calcula e compara o checksum
 				int chk = calcChecksum(&UARTRxBuffer[i+1], 15);  // de 'A' até ao fim do CO2
@@ -411,7 +427,7 @@ int cmdProcessor(void)
 						if (*(sid+1) == '-') T = -T;
 			
 						if (T < -50 || T > 60) {
-							erraseRxBuff(rxBufLen);
+							eraseRxBuff(rxBufLen);
 							return VALUES_ERROR;
 						}
 			
@@ -423,7 +439,7 @@ int cmdProcessor(void)
 						
 						if (H>100 || H<0)
 						{
-							erraseRxBuff(rxBufLen);
+							eraseRxBuff(rxBufLen);
 							return VALUES_ERROR;
 						}
 					sid+=4;
@@ -436,7 +452,7 @@ int cmdProcessor(void)
 						
 						
 						if (C < 400 || C > 20000) {
-							erraseRxBuff(rxBufLen);
+							eraseRxBuff(rxBufLen);
 							return VALUES_ERROR;
 						}
 
@@ -453,7 +469,7 @@ int cmdProcessor(void)
 				addValue(hum,&index_hum,H);
 				addValue(co2,&index_co2,C);
 
-				for (int i = 0; i < UARTRxBuffer; i++)
+				for (int i = 0; i < rxBufLen; i++)
 				{
 					txChar((unsigned char)(UARTRxBuffer[i]));
 				}
@@ -461,12 +477,13 @@ int cmdProcessor(void)
 				num2char(&UARTTxBuffer[txBufLen-3],chk,3);
 
 
-				erraseRxBuff(rxBufLen);
+				eraseRxBuff(rxBufLen);
 				return END;
+			}	
 			case 'L':
-						
+			{			
 				if (UARTRxBuffer[i+8] != EOF_SYM) {
-					erraseRxBuff(rxBufLen);
+					eraseRxBuff(rxBufLen);
 					return EOF_ERROR;
 				}
 				
@@ -510,57 +527,58 @@ int cmdProcessor(void)
 					txChar(CO2_ascii[3]);
 				}	
 
-				erraseRxBuff(rxBufLen);
+				eraseRxBuff(rxBufLen);
 
 				return END;
-				case 'R': {
-					// 1. Verifica EOF
-					if (UARTRxBuffer[i+8] != EOF_SYM) {
-						erraseRxBuff(rxBufLen);
-						return EOF_ERROR;
-					}
-				
-					// 2. Verifica checksum
-					int chk = calcChecksum(&UARTRxBuffer[i+1], 1);
-					int chk_recv = char2num(&UARTRxBuffer[i+5], 3);
-					if (chk != chk_recv)
-						return CHECKSUM_BAD;
-				
-					// 3. Reset aos índices
-					index_temp = 0;
-					index_hum = 0;
-					index_co2 = 0;
-				
-					// 4. Limpar os arrays
-					for (int i = 0; i < MAX_SIZE; i++) {
-						temp[i] = 0;
-						hum[i] = 0;
-						co2[i] = 0;
-					}
-				
-					// 5. Ecoa a mensagem original
-					for (int i = 0; i < rxBufLen; i++)
-						txChar(UARTRxBuffer[i]);
-				
-					// 6. Envia o checksum
-					unsigned char chk_ascii[3];
-					num2char(chk_ascii, chk, 'c'); // 3 dígitos ASCII
-					txChar(chk_ascii[0]);
-					txChar(chk_ascii[1]);
-					txChar(chk_ascii[2]);
-				
-					// 7. Limpa e termina
-					erraseRxBuff(rxBufLen);
-					return END;
+			}
+			case 'R':
+			{
+				// 1. Verifica EOF
+				if (UARTRxBuffer[i + 8] != EOF_SYM)
+				{
+					eraseRxBuff(rxBufLen);
+					return EOF_ERROR;
 				}
-				
-				
 
+				// 2. Verifica checksum
+				int chk = calcChecksum(&UARTRxBuffer[i + 1], 1);
+				int chk_recv = char2num(&UARTRxBuffer[i + 5], 3);
+				if (chk != chk_recv)
+					return CHECKSUM_BAD;
 
+				// 3. Reset aos índices
+				index_temp = 0;
+				index_hum = 0;
+				index_co2 = 0;
 
+				// 4. Limpar os arrays
+				for (int i = 0; i < MAX_SIZE; i++)
+				{
+					temp[i] = 0;
+					hum[i] = 0;
+					co2[i] = 0;
+				}
+
+				// 5. Ecoa a mensagem original
+				for (int i = 0; i < rxBufLen; i++)
+					txChar(UARTRxBuffer[i]);
+
+				// 6. Envia o checksum
+				unsigned char chk_ascii[3];
+				num2char(chk_ascii, chk, 'c'); // 3 dígitos ASCII
+				txChar(chk_ascii[0]);
+				txChar(chk_ascii[1]);
+				txChar(chk_ascii[2]);
+
+				// 7. Limpa e termina
+				eraseRxBuff(rxBufLen);
+				return END;
+			}
 			default:
-				erraseRxBuff(rxBufLen);
-				return INV_COMM;				
+			{
+				eraseRxBuff(rxBufLen);
+				return INV_COMM;	
+			}				
 		}
 		
 		

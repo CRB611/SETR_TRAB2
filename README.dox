@@ -2,13 +2,20 @@
 
 @mainpage SETR Trabalho 2 - Doubly Linked List (DLL)
 
-@author Celina Brito
-@author Simão Ribeiro
+@brief This is our second assignment for our "Sistemas Embutidos e de Tempo Real" course, whit the intention of aquainting us with unit testing, 
+we were asked to make a module that is responsible for conecting three sensors (Temperature, Humidity and C0<sub>2</sub>) to a device using UARTA transmission.
+This communication is made in ASCII and each command consists of:
+<ul>
+    <li><b>'#':</b> A char representing the start of the frame; </li>
+    <li><b>'!':</b> A char representing the end of the frame; </li>
+    <li><b>A command:</b> A char representing the command, 'T' for Temperature, 'H' for Humidity and 'C' for C0<sub>2</sub>; </li>
+    <li><b>Data:</b> Additional data, if required; </li>
+    <li><b>The checksum:</b> The sum of the numerical value of the command and the data bytes, the number is sent in three chars. </li>
+</ul>
 
-@brief This is our second assignment for our "Sistemas Embutidos e de Tempo Real" course, in this assignment we were asked to make
+Ins this project we were also asked to emulate the UART connection.
 
-@details . 
-<br>
+@details 
 <b>Features</b><br>
 <ul>
     <li><i>blabla:</i> blabla </li>
@@ -16,18 +23,38 @@
 
 <b>File Structure:</b><br>
 <ul>
-    <li><i>cmdproc.h:</i> Header file with the functions and structures. </li>
-    <li><i>cmdproc.c:</i> SOurce file containing the implementation of the code needed to the </li>
-    <li><i>main.c:</i> Main file where it is shown that the module works and tests are run. </li>
+    <li><b><u>src</u></b> Folder where the module and main files are:
+        <ul>
+            <li><i>cmdproc.c:</i> Source file containing the implementation of the code needed for the module; </li>
+            <li><i>cmdproc.h:</i> Header file containing the functions, structures and macros needed for the module; </li>
+            <li><i>main.c:</i> Main file, where the tests and the module come together. </li>
+        </ul>
+    </li>
+    <li><b><u>tests</u></b> Folder where the test files are:
+        <ul>
+            <li><i>test.c:</i> Source file containing the implementation of the tests using UNITY; </li>
+            <li><i>test.h:</i> Header file containing the functions, structures and macros needed for the UNITY tests; </li>
+        </ul>
+    </li>
+     <li><b><u>build</u></b> Folder where the .o files are generated to.</li>
+     <li><b><u>unity</u></b> Folder where the files required to use UNITY are stored.</li>
+     <li><i>makefile</i> The makefile that allows us to run the code.</li>
 </ul>
 
 
 <b>Usage:</b><br>
-To use this module run the make on the main folder and then run the main executable inside the bin foulder.
+To use this module run the make command on the main folder, this will generate the .o files in the build directory and the main executable on the base directory.
+After the main executable is generated run ./main to execute.
 
 <b>Test scenarios covered:</b><br>
 <ul>
-    <li>blablablab.</li>
+    <li><i>Initialization:</i> Initialization of the module.</li>
+    <li><i>Command processing:</i> Each command is tested, including occurences where a wrong command or data is sent</li>
+    <li><i>Checksum:</i> The checksum is tested.</li>
+    <li><i>Convertion:</i> The ASCII to int and int to ASCII conversions are also tested.</li>
+    <li><i>Buffers:</i> Buffer processes like adding elements and geting data are tested.</li>
 </ul>
 
+@author Celina Brito
+@author Simão Ribeiro
 */
