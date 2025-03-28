@@ -283,37 +283,107 @@ int cmdProcessor(void)
 				
 
 				
-				/* Check checksum */
-				int chk = calcChecksum(&UARTRxBuffer[i+1], 5); // inclui o tipo, sinal e valor
-				int chk_recv = char2num(&UARTRxBuffer[i+6], 3); // os três dígitos ASCII
-				
-				if (chk != chk_recv) {
-					return CHECKSUM_BAD;
-				}
-				
+					/* Check checksum */
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 5); // inclui o tipo, sinal e valor
+					int chk_recv = char2num(&UARTRxBuffer[i+6], 3); // os três dígitos ASCII
+					
+					if (chk != chk_recv) {
+						return CHECKSUM_BAD;
+					}
+					
 
-				int c_n = char2num(&UARTRxBuffer[i+4],2);
+					int c_n = char2num(&UARTRxBuffer[i+4],2);
 
-				if(UARTRxBuffer[i+3] == '-'){
-					c_n=-c_n;
-				}
+					if(UARTRxBuffer[i+3] == '-'){
+						c_n=-c_n;
+					}
 
-				if (c_n>60 || c_n<-50)
-				{
+					if (c_n>60 || c_n<-50)
+					{
+						erraseRxBuff(rxBufLen);
+						return VALUES_ERROR;
+					}
+					
+					addValue(temp,&index_temp,c_n);
+					for(int i =0;i<rxBufLen;i++){
+						txChar((unsigned char)(UARTRxBuffer[i]));
+					}
+
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
+
 					erraseRxBuff(rxBufLen);
-					return VALUES_ERROR;
+					return END;
+
 				}
+				else if(sid=='h'){
+
+					if(UARTRxBuffer[i+10] != EOF_SYM){
+						erraseRxBuff(rxBufLen);
+						return EOF_ERROR;
+
+					}
+					
+					/* Check checksum */
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 6); // inclui o tipo, sinal e valor
+					int chk_recv = char2num(&UARTRxBuffer[i+7], 3); // os três dígitos ASCII
+					
+					if (chk != chk_recv) {
+						return CHECKSUM_BAD;
+					}
+					
+					int c_n = char2num(&UARTRxBuffer[i+4],3);
+
+					if (c_n>100 || c_n<0)
+					{
+						erraseRxBuff(rxBufLen);
+						return VALUES_ERROR;
+					}
+
+					addValue(hum,&index_hum,c_n);
+					for(int i =0;i<rxBufLen;i++){
+						txChar((unsigned char)(UARTRxBuffer[i]));
+					}
+
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
+
+					erraseRxBuff(rxBufLen);
+					return END;
+				}
+				else if (sid == 'c') {
+					if(UARTRxBuffer[i+12] != EOF_SYM){
+						erraseRxBuff(rxBufLen);
+						return EOF_ERROR;
+					}
 				
-				//SaddValue(temp,&index_temp,c_n);
-				for(int i =0;i<rxBufLen;i++){
-					txChar((unsigned char)(UARTRxBuffer[i]));
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 7); // 'P', 'c', '+', d1, d2, d3, d4, d5
+					int chk_recv = char2num(&UARTRxBuffer[i+9], 3);
+				
+					if (chk != chk_recv) {
+						return CHECKSUM_BAD;
+					}
+				
+					int c_n = char2num(&UARTRxBuffer[i+4], 5); // lê 5 dígitos
+
+				
+					if (c_n < 400 || c_n > 20000) {
+						erraseRxBuff(rxBufLen);
+						return VALUES_ERROR;
+					}
+				
+					addValue(co2, &index_co2, c_n);
+				
+					for (int j = 0; j < rxBufLen; j++) {
+						txChar(UARTRxBuffer[j]);
+					}
+
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
+					erraseRxBuff(rxBufLen);
+					return END;
+
 				}
-
-				num2char(&UARTTxBuffer[txBufLen-3],chk,3);
-
-				erraseRxBuff(rxBufLen);
-				return END;
-
+				else{
+					erraseRxBuff(rxBufLen);
+					return INV_COMM;
 				}
 			
 				/* Command is (is it? ... ) valid. Produce answer and terminate */ 
