@@ -205,6 +205,36 @@ Get CO2 first
 int getFirstco2(void){
 	return co2[0];
 }
+
+
+
+
+/*
+Errase RX BUFF
+*/
+void erraseRxBuff(int len){
+
+	memmove(UARTRxBuffer,UARTRxBuffer+len,UARTRxBuffer-len);
+	rxBufLen-=len;
+	UARTRxBuffer[rxBufLen] = '\0';
+
+
+
+}
+/*
+Errase TX BUFF
+*/
+void erraseTxBuff(int len){
+
+	memmove(UARTTxBuffer,UARTTxBuffer+len,UARTTxBuffer-len);
+	txBufLen-=len;
+	UARTTxBuffer[txBufLen] = '\0';
+
+
+
+}
+
+
 /* 
  * cmdProcessor
  */ 
@@ -237,20 +267,223 @@ int cmdProcessor(void)
 		
 				/* Check sensor type */
 				sid = UARTRxBuffer[i+2];
+				
 				if(sid != 't' && sid != 'h' && sid != 'c') {
 					return NOT_SENSOR;
 				}
+
+
+				if ( sid =='t')
+				{
+					if(UARTRxBuffer[i+9] != EOF_SYM){
+						erraseRxBuff(rxBufLen);
+						return EOF_ERROR;
+
+					}
 				
-				/* Check checksum */
-				if(!(calcChecksum(&(UARTRxBuffer[i+1]),2))) {
-					return CHECKSUM_BAD;
+
+				
+					/* Check checksum */
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 5); // inclui o tipo, sinal e valor
+					int chk_recv = char2num(&UARTRxBuffer[i+6], 3); // os três dígitos ASCII
+					
+					if (chk != chk_recv) {
+						return CHECKSUM_BAD;
+					}
+					
+
+					int c_n = char2num(&UARTRxBuffer[i+4],2);
+
+					if(UARTRxBuffer[i+3] == '-'){
+						c_n=-c_n;
+					}
+
+					if (c_n>60 || c_n<-50)
+					{
+						erraseRxBuff(rxBufLen);
+						return VALUES_ERROR;
+					}
+					
+					addValue(temp,&index_temp,c_n);
+					for(int i =0;i<rxBufLen;i++){
+						txChar((unsigned char)(UARTRxBuffer[i]));
+					}
+
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
+
+					erraseRxBuff(rxBufLen);
+					return END;
+
 				}
+				else if(sid=='h'){
+
+					if(UARTRxBuffer[i+10] != EOF_SYM){
+						erraseRxBuff(rxBufLen);
+						return EOF_ERROR;
+
+					}
+					
+					/* Check checksum */
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 6); // inclui o tipo, sinal e valor
+					int chk_recv = char2num(&UARTRxBuffer[i+7], 3); // os três dígitos ASCII
+					
+					if (chk != chk_recv) {
+						return CHECKSUM_BAD;
+					}
+					
+					int c_n = char2num(&UARTRxBuffer[i+4],3);
+
+					if (c_n>100 || c_n<0)
+					{
+						erraseRxBuff(rxBufLen);
+						return VALUES_ERROR;
+					}
+
+					addValue(hum,&index_hum,c_n);
+					for(int i =0;i<rxBufLen;i++){
+						txChar((unsigned char)(UARTRxBuffer[i]));
+					}
+
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
+
+					erraseRxBuff(rxBufLen);
+					return END;
+				}
+				else if (sid == 'c') {
+					if(UARTRxBuffer[i+12] != EOF_SYM){
+						erraseRxBuff(rxBufLen);
+						return EOF_ERROR;
+					}
 				
-				/* Check EOF */
-				if(UARTRxBuffer[i+6] != EOF_SYM) {
-					return WRONG_FORMAT;
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 7); // 'P', 'c', '+', d1, d2, d3, d4, d5
+					int chk_recv = char2num(&UARTRxBuffer[i+9], 3);
+				
+					if (chk != chk_recv) {
+						return CHECKSUM_BAD;
+					}
+				
+					int c_n = char2num(&UARTRxBuffer[i+4], 5); // lê 5 dígitos
+
+				
+					if (c_n < 400 || c_n > 20000) {
+						erraseRxBuff(rxBufLen);
+						return VALUES_ERROR;
+					}
+				
+					addValue(co2, &index_co2, c_n);
+				
+					for (int j = 0; j < rxBufLen; j++) {
+						txChar(UARTRxBuffer[j]);
+					}
+
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
+					erraseRxBuff(rxBufLen);
+					return END;
+
+				}
+				else{
+					erraseRxBuff(rxBufLen);
+					return INV_COMM;
+				}
+				case 'A':
+				int T, H, C;
+			
+				// Verifica se a mensagem termina corretamente
+				if (UARTRxBuffer[i+19] != EOF_SYM) {
+					erraseRxBuff(rxBufLen);
+					return EOF_ERROR;
 				}
 			
+				// Calcula e compara o checksum
+				int chk = calcChecksum(&UARTRxBuffer[i+1], 15);  // de 'A' até ao fim do CO2
+				int chk_recv = char2num(&UARTRxBuffer[i+16], 3); // posições 16 a 18
+			
+				if (chk != chk_recv) {
+					return CHECKSUM_BAD;
+				}
+			
+				// Ponteiro para percorrer os campos t, h, c
+				unsigned char *sid = &UARTRxBuffer[i+2];
+			
+				while (*sid != EOF_SYM) {
+					if (*sid == 't') {
+						T = 10 * (*(sid+2) - '0') + (*(sid+3) - '0');
+						if (*(sid+1) == '-') T = -T;
+			
+						if (T < -50 || T > 60) {
+							erraseRxBuff(rxBufLen);
+							return VALUES_ERROR;
+						}
+			
+						sid += 4; // avançar 4 posições: t + sinal + 2 dígitos
+					}
+					else if(*sid == 'h'){
+
+						H=100*(*(sid+1)-'0')+10*(*(sid+2)-'0'+(*(sid+3)-'0'));
+						
+						if (H>100 || H<0)
+						{
+							erraseRxBuff(rxBufLen);
+							return VALUES_ERROR;
+						}
+					sid+=4;
+					
+					
+					}
+					else if(*sid == 'c'){
+						C=10000*(*(sid+1)-'0')+1000*(*(sid+2)-'0')+100*(*(sid+3)-'0')+10*(*(sid+4)-'0')+(*(sid+5)-'0');
+						
+						
+						
+						if (C < 400 || C > 20000) {
+							erraseRxBuff(rxBufLen);
+							return VALUES_ERROR;
+						}
+
+
+					sid+=6;	
+
+					} else{
+						sid+=3;
+						return INV_COMM;
+					}
+					
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				/* Command is (is it? ... ) valid. Produce answer and terminate */ 
 				txChar('#');
 				txChar('p'); /* p is the reply to P 							*/	
