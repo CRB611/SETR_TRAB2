@@ -5,9 +5,7 @@
 
 void setUp(void)
 {
-	int Sensor_Temp=(10, 56,-34 -60, 45, 60, -50, 34,26);
-    int Sensor_Humidity=(15,64,89,100,-3,15,48,156,20,0);	
-    int Sensor_co2=(400,599,2687,16444,6245,5846,1332,200,60000,85);
+	init();
 	return;
 }
 void tearDown(void)
@@ -15,11 +13,11 @@ void tearDown(void)
 	return;
 }
 
-/*void test_cmdproc_init(void)
+void test_cmdproc_init(void)
 {
 	init();
-	TEST_ASSERT_EQUAL_INT(0,TxBuffer_length());
-}*/
+	TEST_ASSERT_EQUAL_INT(0,getTxBufferLen());
+}
 
 void test_command_A(void){
 	rxChar('#');	//start
@@ -131,3 +129,93 @@ void teste_txchar(void){
 
 	TEST_ASSERT_EQUAL_INT(0,getTxBufferLen());
 }
+
+void teste_rxchar(void){
+	unsigned char rxBuffer[UART_RX_SIZE];
+	unsigned char expectBuffer[UART_RX_SIZE];
+
+
+	for (int i = 0; i < UART_RX_SIZE; i++)
+	{
+		int dummy = rxChar('8');
+		if (i < UART_RX_SIZE)
+		{
+			TEST_ASSERT_EQUAL_INT(OK,dummy);
+
+			expectBuffer[i]='8';
+		}else{
+
+			TEST_ASSERT_EQUAL_INT(FULL_BUFF,dummy);
+		}
+		
+	}
+	int len = getRxBufferLen(); // getTxBufferLen() devolve um int
+	getRxBuffer(rxBuffer, &len); // &len é um int*
+	TEST_ASSERT_EQUAL_STRING_LEN(expectBuffer,rxBuffer,UART_TX_SIZE);
+
+	resetRxBuffer();
+
+	TEST_ASSERT_EQUAL_INT(0,getRxBufferLen());
+}
+
+
+void test_num2char(void){
+	
+	int a=123, b=-34;
+	
+	unsigned char *achar;
+
+	num2char(achar,a,'h');
+	
+	printf("test h:  " );
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("123",&achar,3);
+
+	num2char(achar,a,'c');
+
+	printf("test c:  " );
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("00123",&achar,5);
+
+	num2char(achar,a,'t');
+
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("+123",&achar,4);
+
+	//num2char(bchar,b,'t');
+
+	//TEST_ASSERT_EQUAL_CHAR_ARRAY("-034",&achar,4);
+}
+
+void test_char2num(void){
+
+	unsigned char number[3]={'1','2','3'};
+
+	unsigned int numberint=char2num(number,3);
+
+	TEST_ASSERT_EQUAL_INT(123,numberint);
+
+}
+
+
+void test_rbuff(void){
+
+	TEST_ASSERT_EQUAL_INT(0,getRxBufferLen());
+
+	rxChar('f');
+	rxChar('s');
+	rxChar('d');
+
+	TEST_ASSERT_EQUAL_INT(3,getRxBufferLen());
+
+}	
+
+
+void test_tbuff(void){
+
+	TEST_ASSERT_EQUAL_INT(0,getTxBufferLen());
+
+	txChar('f');
+	txChar('s');
+	txChar('d');
+
+	TEST_ASSERT_EQUAL_INT(3,getTxBufferLen());
+
+}	

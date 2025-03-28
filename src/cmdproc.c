@@ -3,7 +3,7 @@
 /* ****************************** */
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <math.h> 
 
 #include "cmdproc.h"
 
@@ -98,6 +98,19 @@ int getTxBuffer(unsigned char * buf, int * len)
 	}		
 	return 0;
 }
+
+int getRxBuffer(unsigned char * buf, int * len)
+{
+	if(rxBufLen==0){
+		return EMPTY;
+	}
+
+	*len = rxBufLen;
+	if(rxBufLen > 0) {
+		memcpy(buf,UARTRxBuffer,*len);
+	}		
+	return 0;
+}
 /*
 *getTxBufferLen
 */
@@ -108,11 +121,25 @@ if (txBufLen <= UART_TX_SIZE )
 	return txBufLen;
 }else
 	return FULL_BUFF; // Size_error 
+}
+
+
+int clearRXBuffer(int * len){
+	return OK;
+}
+
+int getRxBufferLen(void){
+
+	if (rxBufLen <= UART_RX_SIZE )
+	{
+		return rxBufLen;
+	}else
+		return FULL_BUFF; // Size_error 
+	}
 
 /*
 *Init function
 */
-}
 int init(void){
 	index_temp=0;
 	index_co2=0;
@@ -125,6 +152,7 @@ int init(void){
 	}
 	resetRxBuffer();
 	resetTxBuffer();
+
 	if(txBufLen==0){
 		return EMPTY;//vazio
 	}else{
@@ -257,75 +285,47 @@ int cmdProcessor(void)
 
 }
 
-
-
-
-
-
-
-
-
-char* num2char(int num,char type){
-
-	char number[6],temp[6];
-
-	if (type == 't')
-	{
+void num2char(unsigned char *array, int num, char type){
 	
-		int i=1;
+	int length=3;
+	int i=0;
 
-		//checking if its a negative number
-		if (num < 0)
+	if (type=='t')
+	{
+		i = 1;
+		if (num >= 0)
 		{
-			number[0]='-';		
+			*array='+';
 		}else{
-			number[0]='+';
+			*array='-';
 		}
-		
-		num=abs(num);
-
-		while (num >= 10)
-		{
-			number[i] = (char)(num % 10) + '0';
-			temp[i]=number[i];
-			i++;
-			num=num/10;
-		}
-		number[i]=(char)num+'0';
-		temp[i]=number[i];
-		
-
-		int count=i;
-		for (int k = 1; k <= count; k++)
-		{
-			number[k]=temp[i];
-			i--;	
-		}
-		
-		return number;
-	}else{
-		int i=0;
-
-		while (num >= 10)
-		{
-			number[i] = (char)(num % 10) + '0';
-			temp[i]=number[i];
-			i++;
-			num=num/10;
-		}
-		number[i]=(char)num+'0';
-		temp[i]=number[i];
-		
-		int count=i;
-		for (int k = 1; k <= count; k++)
-		{
-			number[k]=temp[i];
-			i--;	
-		}
-		
-		return number;
+				
+	}else if(type=='c'){
+		length=5;
 	}
+	
+    while (i < length) {
+        *(array - i) = (num % 10) + '0';
+        num /= 10;
+        i++;
+    }
+	
 }
+
+unsigned int char2num(unsigned char ascii [], int length){
+	int i = 0, sum = 0, mult = pow(10,length-1);
+	int x;
+	
+	while(i < length){
+		x= (ascii[i]-'0') *mult ;
+
+	  	sum += x;
+		mult/=10;
+	  	i++;
+	}
+	return sum;
+}
+
 
 
 

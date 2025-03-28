@@ -1,4 +1,4 @@
-CFLAGS =-Wall -Wfatal-errors -ggdb -pthread
+CFLAGS =-Wall -Wfatal-errors -ggdb -pthread -g
 CC=gcc
 
 TARGET = main
@@ -8,13 +8,7 @@ TARGET = main
 all: $(TARGET)
 
 main: build/main.o build/cmdproc.o build/test.o build/unity.o
-	$(CXX) $(CFLAGS) -o $@ $^ 
-
-teste: build/teste.o build/cmdproc.o build/test.o build/unity.o
-	$(CXX) $(CFLAGS) -o $@ $^ 
-
-build/teste.o: src/teste.c
-	$(CXX) $(CFLAGS) -c $< -o $@
+	$(CXX)  -o $@ $^  $(CFLAGS)
 
 build/main.o: src/main.c
 	$(CXX) $(CFLAGS) -c $< -o $@
