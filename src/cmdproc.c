@@ -385,32 +385,69 @@ int cmdProcessor(void)
 					erraseRxBuff(rxBufLen);
 					return INV_COMM;
 				}
-			case 'A':
-				int T,H,C;
-				if (UARTRxBuffer[i+19] != EOF_SYM)
-				{
+				case 'A':
+				int T, H, C;
+			
+				// Verifica se a mensagem termina corretamente
+				if (UARTRxBuffer[i+19] != EOF_SYM) {
 					erraseRxBuff(rxBufLen);
 					return EOF_ERROR;
 				}
-
-				int chk = calcChecksum(&UARTRxBuffer[i+1], 15);     // de 'A' até ao último dígito do CO₂
-				int chk_recv = char2num(&UARTRxBuffer[i+16], 3);     // posições 16, 17, 18 (ASCII)
-				
+			
+				// Calcula e compara o checksum
+				int chk = calcChecksum(&UARTRxBuffer[i+1], 15);  // de 'A' até ao fim do CO2
+				int chk_recv = char2num(&UARTRxBuffer[i+16], 3); // posições 16 a 18
+			
 				if (chk != chk_recv) {
 					return CHECKSUM_BAD;
 				}
+			
+				// Ponteiro para percorrer os campos t, h, c
+				unsigned char *sid = &UARTRxBuffer[i+2];
+			
+				while (*sid != EOF_SYM) {
+					if (*sid == 't') {
+						T = 10 * (*(sid+2) - '0') + (*(sid+3) - '0');
+						if (*(sid+1) == '-') T = -T;
+			
+						if (T < -50 || T > 60) {
+							erraseRxBuff(rxBufLen);
+							return VALUES_ERROR;
+						}
+			
+						sid += 4; // avançar 4 posições: t + sinal + 2 dígitos
+					}
+					else if(*sid == 'h'){
 
-				sid = UARTRxBuffer[i+2];
-				while (sid != '!')
-				{
-					if (sid == 't')
-					{
-						T=10*((sid+2)-'0')+(sid+3)-'0';
+						H=100*(*(sid+1)-'0')+10*(*(sid+2)-'0'+(*(sid+3)-'0'));
+						
+						if (H>100 || H<0)
+						{
+							erraseRxBuff(rxBufLen);
+							return VALUES_ERROR;
+						}
+					sid+=4;
+					
+					
+					}
+					else if(*sid == 'c'){
+						C=10000*(*(sid+1)-'0')+1000*(*(sid+2)-'0')+100*(*(sid+3)-'0')+10*(*(sid+4)-'0')+(*(sid+5)-'0');
+						
+						
+						
+						if (C < 400 || C > 20000) {
+							erraseRxBuff(rxBufLen);
+							return VALUES_ERROR;
+						}
+
+
+					sid+=6;	
+
+					} else{
+						sid+=3;
+						return INV_COMM;
 					}
 					
-				}
-				
-
 
 
 
