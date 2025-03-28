@@ -161,27 +161,24 @@ void teste_rxchar(void){
 
 void test_num2char(void){
 	
-	int a=123, b=-34;
+	int a=123, b=-34, c=50003; 
 	
-	unsigned char *achar;
+	unsigned char result[6];
 
-	num2char(achar,a,'h');
-	
-	printf("test h:  " );
-	TEST_ASSERT_EQUAL_CHAR_ARRAY("123",&achar,3);
+	num2char(&result[0],a,'h');
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("123",&result,3);
 
-	num2char(achar,a,'c');
+	num2char(&result[0],a,'t');
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("+123",&result,4);
 
-	printf("test c:  " );
-	TEST_ASSERT_EQUAL_CHAR_ARRAY("00123",&achar,5);
+	num2char(&result[0],b,'t');
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("-034",&result,4);
 
-	num2char(achar,a,'t');
+	num2char(&result[0],c,'c');
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("50003",&result,5);
 
-	TEST_ASSERT_EQUAL_CHAR_ARRAY("+123",&achar,4);
-
-	//num2char(bchar,b,'t');
-
-	//TEST_ASSERT_EQUAL_CHAR_ARRAY("-034",&achar,4);
+	num2char(&result[0],a,'c');
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("00123",&result,5);
 }
 
 void test_char2num(void){
