@@ -205,6 +205,36 @@ Get CO2 first
 int getFirstco2(void){
 	return co2[0];
 }
+
+
+
+
+/*
+Errase RX BUFF
+*/
+void erraseRxBuff(int len){
+
+	memmove(UARTRxBuffer,UARTRxBuffer+len,UARTRxBuffer-len);
+	rxBufLen-=len;
+	UARTRxBuffer[rxBufLen] = '\0';
+
+
+
+}
+/*
+Errase TX BUFF
+*/
+void erraseTxBuff(int len){
+
+	memmove(UARTTxBuffer,UARTTxBuffer+len,UARTTxBuffer-len);
+	txBufLen-=len;
+	UARTTxBuffer[txBufLen] = '\0';
+
+
+
+}
+
+
 /* 
  * cmdProcessor
  */ 
@@ -237,18 +267,53 @@ int cmdProcessor(void)
 		
 				/* Check sensor type */
 				sid = UARTRxBuffer[i+2];
+				
 				if(sid != 't' && sid != 'h' && sid != 'c') {
 					return NOT_SENSOR;
 				}
+
+
+				if ( sid =='t')
+				{
+					if(UARTRxBuffer[i+9] != EOF_SYM){
+						erraseRxBuff(rxBufLen);
+						return EOF_ERROR;
+
+					}
+				
+
 				
 				/* Check checksum */
-				if(!(calcChecksum(&(UARTRxBuffer[i+1]),2))) {
+				int chk = calcChecksum(&UARTRxBuffer[i+1], 5); // inclui o tipo, sinal e valor
+				int chk_recv = char2num(&UARTRxBuffer[i+6], 3); // os três dígitos ASCII
+				
+				if (chk != chk_recv) {
 					return CHECKSUM_BAD;
 				}
 				
-				/* Check EOF */
-				if(UARTRxBuffer[i+6] != EOF_SYM) {
-					return WRONG_FORMAT;
+
+				int c_n = char2num(&UARTRxBuffer[i+4],2);
+
+				if(UARTRxBuffer[i+3] == '-'){
+					c_n=-c_n;
+				}
+
+				if (c_n>60 || c_n<-50)
+				{
+					erraseRxBuff(rxBufLen);
+					return VALUES_ERROR;
+				}
+				
+				//SaddValue(temp,&index_temp,c_n);
+				for(int i =0;i<rxBufLen;i++){
+					txChar((unsigned char)(UARTRxBuffer[i]));
+				}
+
+				num2char(&UARTTxBuffer[txBufLen-3],chk,3);
+
+				erraseRxBuff(rxBufLen);
+				return END;
+
 				}
 			
 				/* Command is (is it? ... ) valid. Produce answer and terminate */ 

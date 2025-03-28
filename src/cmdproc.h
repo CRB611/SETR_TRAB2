@@ -29,10 +29,11 @@
  /* Other defines should be return codes of the functions */
  /* E.g. #define CMD_EMPTY_STRING -1                      */
  #define MAX_SIZE 20
- #define UART_RX_SIZE 20 	///< Maximum size of the RX buffer  
- #define UART_TX_SIZE 20 	///< Maximum size of the TX buffer 
+ #define UART_RX_SIZE 30 	///< Maximum size of the RX buffer  
+ #define UART_TX_SIZE 30 	///< Maximum size of the TX buffer 
  #define SOF_SYM '#'	        ///< Start of Frame Symbol
  #define EOF_SYM '!'         ///< End of Frame Symbol 
+ #define EOF_ERROR -10       ///< End of frame error status code
  #define OK 0                ///< Return when a function completes without errors
  #define EMPTY -1            ///< ERROR CODE: Empty string or incomplete command found
  #define INV_COMM -2         ///< ERROR CODE: Invalid command
@@ -43,6 +44,7 @@
  #define CHECKSUM_BAD -7     ///< ERROR CODE: The checksum didnt check out
  #define NOT_EMPTY -8        ///< ERROR CODE: Buffer not empty
  #define END -9              ///< End of funciton
+ #define VALUES_ERROR -11    ///< Value error comand
  
  /* Function prototypes */
  /**
@@ -106,7 +108,7 @@
 
  int getRxBufferLen(void);
 
- int clearRXBuffer(unsigned char * buf, int * len);
+ int clearRXBuffer(int * len);
  /**
   * \brief Converts an integer to a ASCII
   * \param ascii pointer to where the converted chars will be stored
