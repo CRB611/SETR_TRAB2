@@ -385,7 +385,7 @@ int cmdProcessor(void)
 					erraseRxBuff(rxBufLen);
 					return INV_COMM;
 				}
-				case 'A':
+			case 'A':
 				int T, H, C;
 			
 				// Verifica se a mensagem termina corretamente
@@ -448,12 +448,21 @@ int cmdProcessor(void)
 						return INV_COMM;
 					}
 					
+				}
+				addValue(temp,&index_temp,T);
+				addValue(hum,&index_hum,H);
+				addValue(co2,&index_co2,C);
+
+				for (int i = 0; i < UARTRxBuffer; i++)
+				{
+					txChar((unsigned char)(UARTRxBuffer[i]));
+				}
+				
+				num2char(&UARTTxBuffer[txBufLen-3],chk,3);
 
 
-
-
-
-
+				erraseRxBuff(rxBufLen);
+				return END;
 
 
 
@@ -518,8 +527,9 @@ int cmdProcessor(void)
 
 }
 
-void num2char(unsigned char *array, int num, char type) {
-    int i = 0, len=3;
+void num2char(unsigned char *array, int num, char type){
+    int i = 0;
+	int len=3;
 
 	//checking what type of data it is
 	if (type=='t')
