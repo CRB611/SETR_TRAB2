@@ -63,12 +63,21 @@ void test_wrong_checksum(void);
  * \brief Performs a test for the txchar function using UNITY
  */
 void teste_txchar(void);
-
+/**
+ * \brief Performs a test for the rxchar function using UNITY
+ */
 void teste_rxchar(void);
 
+/**
+ * \brief Performs a test for the num2char convertion function using UNITY
+ */
 void test_num2char(void);
 
+/**
+ * \brief Performs a test for the char2num convertion function using UNITY
+ */
 void test_char2num(void);
+
 
 void test_rbuff(void);
 

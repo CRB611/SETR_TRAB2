@@ -109,13 +109,18 @@
  int clearRXBuffer(unsigned char * buf, int * len);
  /**
   * \brief Converts an integer to a ASCII
-  * \param ascii pointer to where the converted chars will be stored
+  * \param array pointer to where the converted chars will be stored
   * \param num the integer to be converted
   * \param type 't' for temperature, 'h' for humidity, 'c' for c02
-  * \return Returns the converted char array
   */
-void num2char(unsigned char *ascii, int num, char type);
- 
+ void num2char(unsigned char *array, int num, char type);
+
+ /**
+  * \brief Converts ASCII to int
+  * \param ascii pointer to where the converted chars are stored
+  * \param length number of characters in the ascii code
+  * \return Returns the int corresponding to the character array
+  */
 unsigned int char2num(unsigned char ascii [], int length);
 
 

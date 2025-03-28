@@ -285,31 +285,38 @@ int cmdProcessor(void)
 
 }
 
-void num2char(unsigned char *array, int num, char type){
-	
-	int length=3;
-	int i=0;
+void num2char(unsigned char *array, int num, char type) {
+    int i = 0, len=3;
 
+	//checking what type of data it is
 	if (type=='t')
 	{
-		i = 1;
-		if (num >= 0)
+		if (num>=0)
 		{
 			*array='+';
 		}else{
 			*array='-';
 		}
-				
-	}else if(type=='c'){
-		length=5;
+		num=abs(num);
+		
+		while (i < len) {
+			*(array + len-i) = (num % 10) + '0';
+			num /= 10;
+			i++;
+		} 
+		return;
+
+	}else if (type=='c'){
+		len=5;
 	}
+
+	while (i < len) {
+		*(array + len-i-1) = (num % 10) + '0';
+		num /= 10;
+		i++;
+	} 
 	
-    while (i < length) {
-        *(array - i) = (num % 10) + '0';
-        num /= 10;
-        i++;
-    }
-	
+    
 }
 
 unsigned int char2num(unsigned char ascii [], int length){
