@@ -333,7 +333,19 @@ unsigned int char2num(unsigned char ascii [], int length){
 	return sum;
 }
 
+void addValue(int *array, unsigned int *size, int value){
+	
+	//shifting everything +1
+	for(unsigned int i = *size; i > 0; i--) {
+        array[i] = array[i-1];
+    }
+    array[0] = (unsigned int)value; 
+	
+    if(*size < MAX_SIZE-1) {
+        (*size)++;
+    }
 
+}
 
 
 

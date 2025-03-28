@@ -82,4 +82,11 @@ void test_char2num(void);
 void test_rbuff(void);
 
 void test_tbuff(void);
+
+/**
+ * \brief Performs a test for the addValue function using UNITY
+    \par Two tests are made for this function, the first is the value incertion,
+    and the second is inserting a value with a full list, which "deletes" the last value.
+ */
+void test_addValue(void);
 #endif

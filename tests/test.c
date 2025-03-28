@@ -3,6 +3,7 @@
 #include "../unity/unity.h"
 
 
+static unsigned int size=3;
 void setUp(void)
 {
 	init();
@@ -158,7 +159,6 @@ void teste_rxchar(void){
 	TEST_ASSERT_EQUAL_INT(0,getRxBufferLen());
 }
 
-
 void test_num2char(void){
 	
 	int a=123, b=-34, c=50003; 
@@ -188,9 +188,23 @@ void test_char2num(void){
 	unsigned int numberint=char2num(number,3);
 
 	TEST_ASSERT_EQUAL_INT(123,numberint);
-
 }
 
+
+void test_addValue(void){
+	int a[MAX_SIZE]={1,2,3};
+	int expected[MAX_SIZE]={6,1,2,3};
+	addValue(a,&size,6);
+
+	TEST_ASSERT_EQUAL_INT_ARRAY(expected,a,4);
+	
+	int b[MAX_SIZE]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+	int expectedb[MAX_SIZE]={14,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
+	
+	addValue(b,&size,14);
+
+	TEST_ASSERT_EQUAL_INT_ARRAY(expectedb,b,4);	
+}
 
 void test_rbuff(void){
 

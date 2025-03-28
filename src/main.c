@@ -45,6 +45,7 @@ int main(void)
     RUN_TEST(teste_txchar);
     RUN_TEST(teste_rxchar);
     
+    RUN_TEST(test_addValue);
 
 	tearDown();
 

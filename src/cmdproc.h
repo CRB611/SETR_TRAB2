@@ -166,5 +166,12 @@ unsigned int char2num(unsigned char ascii [], int length);
   */
  int getFirstco2(void);
  
+ /**
+ * \brief Add a value to the begining of the array by shifting the other elements.
+ * \param arr Pointer to the array.
+ * \param size Pointer to the actual size of the array.
+ * \param value The value to be added.
+ */
+void addValue(int *array, unsigned int *size, int value);
  #endif
  
