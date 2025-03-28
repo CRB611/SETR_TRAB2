@@ -7,8 +7,14 @@ TARGET = main
 
 all: $(TARGET)
 
-main: build/main.o build/cmdproc.o build/teste.o build/unity.o
+main: build/main.o build/cmdproc.o build/test.o build/unity.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ 
+
+teste: build/teste.o build/cmdproc.o build/test.o build/unity.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ 
+
+build/teste.o: src/teste.c
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 build/main.o: src/main.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -16,13 +22,11 @@ build/main.o: src/main.c
 build/cmdproc.o: src/cmdproc.c src/cmdproc.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-build/teste.o: src/teste.c src/teste.h 
+build/test.o: tests/test.c tests/test.h 
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 build/unity.o: unity/unity.c unity/unity.h unity/unity_internals.h 
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-
 
 clean:
 	rm -f *.o $(DEFAULT_TARGET)

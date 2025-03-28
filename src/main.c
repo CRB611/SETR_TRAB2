@@ -16,7 +16,7 @@
 #include <string.h>
 #include "cmdproc.h"
 #include "../unity/unity.h"
-#include "teste.h"
+#include "../tests/test.h"
 
 int main(void) 
 {
