@@ -41,7 +41,7 @@
  #define EMPTY -1            ///< ERROR CODE: Empty string or incomplete command found
  #define INV_COMM -2         ///< ERROR CODE: Invalid command
  #define CS_ERROR -3         ///< ERROR CODE: CS error detected (command not executed)
- #define WRONG_FORMAT -4     ///< ERROR CODE: The string format is wrong
+ #define SOF_ERROR -4        ///< ERROR CODE: The START byte does not exist
  #define FULL_BUFF -5        ///< ERROR CODE: Full buffer
  #define NOT_SENSOR -6       ///< ERROR CODE: Wrong sensor type
  #define CHECKSUM_BAD -7     ///< ERROR CODE: The checksum didnt check out
@@ -133,7 +133,7 @@
   * \brief Converts an integer to a ASCII
   * \param array pointer to where the converted chars will be stored
   * \param num the integer to be converted
-  * \param type 't' for temperature, 'h' for humidity, 'c' for c02
+  * \param type 't' for temperature, 'h' for humidity, 'c' for c02 or checksum
   */
  void num2char(unsigned char *array, int num, char type);
 
@@ -210,5 +210,7 @@ void eraseRxBuff(int len);
  * \param len Current length of the buffer.
  */
 void eraseTxBuff(int len);
+
+void setValues(int t[MAX_SIZE], int h[MAX_SIZE], int c[MAX_SIZE]);
  #endif
  

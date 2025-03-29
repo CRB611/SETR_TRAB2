@@ -30,6 +30,8 @@ int main(void)
     RUN_TEST(test_command_P);
     RUN_TEST(test_command_L);
     RUN_TEST(test_command_R);
+    RUN_TEST(test_nonexistent_cmd);
+
     
     printf("\n---Test checksum---\n");
     RUN_TEST(test_wrong_checksum);
@@ -46,7 +48,7 @@ int main(void)
     RUN_TEST(teste_rxchar);
     
     RUN_TEST(test_addValue);
-
+    
 	tearDown();
 
 

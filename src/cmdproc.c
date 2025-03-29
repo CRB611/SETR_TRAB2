@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h> 
-
 #include "cmdproc.h"
 
 /* Internal variables */
@@ -44,10 +43,10 @@ int rxChar(unsigned char car)
 	if (rxBufLen < UART_RX_SIZE) {
 		UARTRxBuffer[rxBufLen] = car;
 		rxBufLen += 1;
-		return 0;		
+		return OK;		
 	}	
 	/* If cmd string full return error */
-	return -1;
+	return FULL_BUFF;
 }
 
 /*
@@ -59,7 +58,7 @@ int txChar(unsigned char car)
 	if (txBufLen < UART_TX_SIZE) {
 		UARTTxBuffer[txBufLen] = car;
 		txBufLen += 1;
-		return END;		
+		return OK;		
 	}	
 	/* If cmd string full return error */
 	return FULL_BUFF;
@@ -213,7 +212,14 @@ int getFirstco2(void){
 	return co2[0];
 }
 
-
+/*
+Seting the sensor arrays for emulation porposes
+*/
+void setValues(int t[MAX_SIZE], int h[MAX_SIZE], int c[MAX_SIZE]){
+	*temp=*t;
+	*hum=*h;
+	*co2=*c;
+}
 
 
 /*
@@ -241,17 +247,20 @@ void eraseTxBuff(int len){
  */ 
 int cmdProcessor(void)
 {
-	unsigned int i;
+	unsigned int i=0,k=0;
 	unsigned char sid;
 		
 	/* Detect empty cmd string */
 	if(rxBufLen == 0)
 		return EMPTY; 
-	
+
 	/* Find index of SOF */
 	for(i=0; i < rxBufLen; i++) {
 		if(UARTRxBuffer[i] == SOF_SYM) {
 			break;
+		}else if (i == (unsigned int)rxBufLen-1){
+			eraseRxBuff(rxBufLen);
+			return SOF_ERROR;
 		}
 	}
 	
@@ -391,36 +400,101 @@ int cmdProcessor(void)
 			case 'A':
 			{
 				int T, H, C;
+				unsigned char T_char[4], H_char[3], C_char[5];
 			
 				// Verifica se a mensagem termina corretamente
-				/*if (UARTRxBuffer[i+19] != EOF_SYM) {
-					eraseRxBuff(rxBufLen);
-					return EOF_ERROR;
-				}*/
-				for (int k = 0; k < 20; k++)
+				for (k = 0; k <= MAX_SIZE; k++)
 				{
+					//printf("%c",UARTRxBuffer[k]);
 					if (UARTRxBuffer[k] == EOF_SYM)
 					{
 						break;
-					}else{
+						
+					// Se não acaba com o simbolo que deve dá erro
+					}else if (k == MAX_SIZE-1){
 						eraseRxBuff(rxBufLen);
-					return EOF_ERROR;
+						return EOF_ERROR;
 					}
-					
+			
 				}
-				
 			
 				// Calcula e compara o checksum
-				int chk = calcChecksum(&UARTRxBuffer[i+1], 15);  // de 'A' até ao fim do CO2
-				int chk_recv = char2num(&UARTRxBuffer[i+16], 3); // posições 16 a 18
+				int chk = calcChecksum(&UARTRxBuffer[i+1], k-4);  // de 'A' até ao fim do CO2
+				int chk_recv = char2num(&UARTRxBuffer[k-3], 3); // posições do fim do c02 até '!'
 			
 				if (chk != chk_recv) {
 					return CHECKSUM_BAD;
 				}
 			
 				// Ponteiro para percorrer os campos t, h, c
-				unsigned char *sid = &UARTRxBuffer[i+2];
-			
+				//unsigned char *sid = &UARTRxBuffer[i+2];
+				
+				//mensagem a ser devolvida
+				txChar('#');	//SOF byte	
+				txChar('a');	//resposta a A
+
+				//obter os resultados
+				T = getFirstTemp();
+				H = getFirstHum();
+				C = getFirstco2();
+
+				//verificar se estão nos intervalos
+				if ((T < -50 || T > 60))
+				{
+					eraseRxBuff(rxBufLen);
+					return VALUES_ERROR;
+				}else if ((H < 0 || H > 100))
+				{
+					eraseRxBuff(rxBufLen);
+					return VALUES_ERROR;
+				}else if ((C < 400 || C > 20000))
+				{
+					eraseRxBuff(rxBufLen);
+					return VALUES_ERROR;
+				}
+				
+				//converter para char
+				num2char(&T_char[0],T,'t');
+				num2char(&H_char[0],H,'h');
+				num2char(&C_char[0],C,'c');
+
+				//inserir dados
+				txChar('t');
+				for (int j = 0; j < 4; j++)
+				{
+					txChar(T_char[j]);
+				}
+
+				txChar('h');
+				for (int j = 0; j < 3; j++)
+				{
+					txChar(H_char[j]);
+				}
+
+				txChar('c');	
+				for (int j = 0; j < 5; j++)
+				{
+					txChar(C_char[j]);
+				}
+
+				//checksum
+				int t_check= calcChecksum(&UARTTxBuffer[2],16);
+				unsigned char t_check_c[3];
+				num2char(&t_check_c[0],t_check,'h');
+
+
+				for (int j = 0; j < 3; j++)
+				{
+					txChar(t_check_c[j]);
+				}
+
+				txChar('!');
+
+				eraseRxBuff(rxBufLen);
+				return OK;
+
+
+			/*
 				while (*sid != EOF_SYM) {
 					if (*sid == 't') {
 						T = 10 * (*(sid+2) - '0') + (*(sid+3) - '0');
@@ -475,10 +549,13 @@ int cmdProcessor(void)
 				}
 				
 				num2char(&UARTTxBuffer[txBufLen-3],chk,3);
-
+				
+				
 
 				eraseRxBuff(rxBufLen);
 				return END;
+				*/
+
 			}	
 			case 'L':
 			{			

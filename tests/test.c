@@ -7,8 +7,14 @@ static unsigned int size=3;
 void setUp(void)
 {
 	init();
+	int t[MAX_SIZE]={50};
+	int h[MAX_SIZE]={50};
+	int c[MAX_SIZE]={500};
+
+	setValues(t,h,c);
 	return;
 }
+
 void tearDown(void)
 {
 	return;
@@ -21,6 +27,9 @@ void test_cmdproc_init(void)
 }
 
 void test_command_A(void){
+	unsigned char txBuffer[UART_RX_SIZE];
+
+	//normal test, everything is supposed to be alright
 	rxChar('#');	//start
 	rxChar('A');	//command
 	rxChar('0');	//checksum
@@ -29,6 +38,81 @@ void test_command_A(void){
 	rxChar('!');	//end
 
 	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+	
+	//testing the transmission
+	int buff_len=getTxBufferLen();
+	getTxBuffer(txBuffer,&buff_len);
+	unsigned char expected[]={'#','a','t','+','0','5','0','h','0','5','0','c','0','0','5','0','0','1','3','7','!'};
+
+	TEST_ASSERT_EQUAL_CHAR_ARRAY(expected,txBuffer,sizeof(expected));
+
+	//message without start byte
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+	
+	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
+
+	/* not working for now
+	printf("\nnoend");
+	//message without end byte
+	rxChar('#');	//start
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	
+	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
+*/
+	
+	int t[MAX_SIZE]={-60};
+	int h[MAX_SIZE]={50};
+	int c[MAX_SIZE]={500};
+	setValues(t,h,c);
+
+	//unnaccepted temp value
+	rxChar('#');	//start
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+	
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+
+	//unnaccepted humidity value
+	int t2[MAX_SIZE]={30};
+	int h2[MAX_SIZE]={500};
+	int c2[MAX_SIZE]={500};
+	setValues(t2,h2,c2);
+
+	rxChar('#');	//start
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+	
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+
+	
+	//unnaccepted co2 value
+	int t3[MAX_SIZE]={30};
+	int h3[MAX_SIZE]={50};
+	int c3[MAX_SIZE]={50};
+	setValues(t3,h3,c3);
+
+	rxChar('#');	//start
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+	
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+
 }
 
 void test_nonexistent_cmd(void){
@@ -39,7 +123,7 @@ void test_nonexistent_cmd(void){
 	rxChar('5');	//checksum
 	rxChar('!');	//end
 
-	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+	TEST_ASSERT_EQUAL_INT(INV_COMM,cmdProcessor());
 }
 
 void test_command_P(void){
@@ -51,6 +135,7 @@ void test_command_P(void){
 	rxChar('9');	//checksum
 	rxChar('6');	//****
 	rxChar('!');	//end
+	rxChar('\0');	//end
 
 	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
 
@@ -123,7 +208,7 @@ void teste_txchar(void){
 		int dummy = txChar('8');
 		if (i < UART_TX_SIZE)
 		{
-			TEST_ASSERT_EQUAL_INT(END,dummy);
+			TEST_ASSERT_EQUAL_INT(OK,dummy);
 
 			expectBuffer[i]='8';
 		}else{
@@ -217,25 +302,75 @@ void test_addValue(void){
 }
 
 void test_rbuff(void){
+	unsigned char rxBuffer[UART_RX_SIZE];
 	
+	//checking if it starts at 0
 	TEST_ASSERT_EQUAL_INT(0,getRxBufferLen());
 
 	rxChar('f');
 	rxChar('s');
 	rxChar('d');
+	rxChar('\0');
+	
+	//testing it the length is right
+	TEST_ASSERT_EQUAL_INT(4,getRxBufferLen());
 
-	TEST_ASSERT_EQUAL_INT(3,getRxBufferLen());
+	int buff_len=getRxBufferLen();
+	getRxBuffer(rxBuffer,&buff_len);
+	
+	//testing it the content is right
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("fsd\0",rxBuffer,4);
+
+	for (int i = buff_len; i < UART_RX_SIZE+3; i++)
+	{
+		//adding to buffer while it isn't full
+		if (i < UART_RX_SIZE)
+		{
+			TEST_ASSERT_EQUAL_INT(OK,rxChar('x'));
+		
+		//adding to buffer while it is full
+		}else{
+			TEST_ASSERT_EQUAL_INT(FULL_BUFF,rxChar('x'));
+		}	
+	}
+
+	buff_len=getRxBufferLen();
+	TEST_ASSERT_EQUAL_INT(UART_RX_SIZE,buff_len);
+	
 }	
 
 
 void test_tbuff(void){
-
+	unsigned char txBuffer[UART_TX_SIZE];
 	TEST_ASSERT_EQUAL_INT(0,getTxBufferLen());
 
 	txChar('f');
 	txChar('s');
 	txChar('d');
+	txChar('\0');
 
-	TEST_ASSERT_EQUAL_INT(3,getTxBufferLen());
+	TEST_ASSERT_EQUAL_INT(4,getTxBufferLen());
+	
+	int buff_len=getTxBufferLen();
+	getTxBuffer(txBuffer,&buff_len);
+	
+	TEST_ASSERT_EQUAL_CHAR_ARRAY("fsd\0",txBuffer,4);
 
+	
+	for (int i = buff_len; i < UART_TX_SIZE+3; i++)
+	{
+		//adding to buffer while it isn't full
+		if (i < UART_TX_SIZE)
+		{
+			TEST_ASSERT_EQUAL_INT(OK,txChar('x'));
+		
+		//adding to buffer while it is full
+		}else{
+			TEST_ASSERT_EQUAL_INT(FULL_BUFF,txChar('x'));
+		}	
+	}
+
+	buff_len=getTxBufferLen();
+	TEST_ASSERT_EQUAL_INT(UART_TX_SIZE,buff_len);
+	
 }	

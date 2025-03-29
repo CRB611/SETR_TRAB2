@@ -92,11 +92,17 @@ void test_char2num(void);
 
 /**
  * \brief Performs a test for the reception buffer functions using UNITY
+ * 
+ * To test these functions the buffer length is checked in the ocasion it should be empty, have a determined number of elements or when it is full.
+ * The contents on the buffer are also checked.
  */
 void test_rbuff(void);
 
 /**
- * \brief Performs a test for the tx buffer functions using UNITY
+ * \brief Performs a test for the tx buffer functions using UNITY* 
+ * 
+ * To test these functions the buffer length is checked in the ocasion it should be empty, have a determined number of elements or when it is full.
+ * The contents on the buffer are also checked.
  */
 void test_tbuff(void);
 
