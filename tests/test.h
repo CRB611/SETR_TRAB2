@@ -66,6 +66,13 @@ void test_command_R(void);
 void test_nonexistent_cmd(void);
 
 /**
+ * \brief Tests the occurrence of the sensors sending an unnaccepted value
+ * 
+ * This function tests all values in the A and P commands.
+ */
+void test_wrong_values(void);
+
+/**
  * \brief Tests the occurrence of a wrong checksum being sent
  */
 void test_wrong_checksum(void);
@@ -113,4 +120,7 @@ void test_tbuff(void);
  *  and the second is inserting a value with a full list, which "deletes" the last value.
  */
 void test_addValue(void);
+
+void test_getsensor(void);
+
 #endif

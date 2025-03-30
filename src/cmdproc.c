@@ -187,10 +187,10 @@ int* get_co2(void){
 /*
 Get ALL (Temp,HUm,Co2)
 */
-void get_all(){
-	get_temp();
-	get_hum();
-	get_co2();
+void get_all(int *t, int *h, int *c){
+	t=get_temp();
+	h=get_hum();
+	c=get_co2();
 }
 
 /*
@@ -227,7 +227,11 @@ Errase RX BUFF
 */
 void eraseRxBuff(int len){
 
-	memmove(UARTRxBuffer,UARTRxBuffer+len,rxBufLen-len);
+	//sets everything to \0
+	for (int i = 0; i < len; i++)
+	{
+		UARTRxBuffer[i]='\0';
+	}
 	rxBufLen-=len;
 	UARTRxBuffer[rxBufLen] = '\0';
 }
@@ -236,7 +240,12 @@ Errase TX BUFF
 */
 void eraseTxBuff(int len){
 
-	memmove(UARTTxBuffer,UARTTxBuffer+len,rxBufLen-len);
+	//sets everything to \0
+	for (int i = 0; i < len; i++)
+	{
+		UARTTxBuffer[i]='\0';
+	}
+	//resets the length
 	txBufLen-=len;
 	UARTTxBuffer[txBufLen] = '\0';
 }

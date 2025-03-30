@@ -174,7 +174,7 @@ unsigned int char2num(unsigned char ascii [], int length);
   * \brief Get the temp,hum,co2 arrays
   * 
   */
- void get_all(void);
+ void get_all( int *t, int *h, int *c);
 
  /**
   * \brief Get last temp from the array

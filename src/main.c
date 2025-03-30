@@ -31,7 +31,7 @@ int main(void)
     RUN_TEST(test_command_L);
     RUN_TEST(test_command_R);
     RUN_TEST(test_nonexistent_cmd);
-
+    RUN_TEST(test_wrong_values);
     
     printf("\n---Test checksum---\n");
     RUN_TEST(test_wrong_checksum);
@@ -47,10 +47,15 @@ int main(void)
     RUN_TEST(teste_txchar);
     RUN_TEST(teste_rxchar);
     
-    RUN_TEST(test_addValue);
     
-	tearDown();
+    printf("\n---Test Adding values---\n");
+    RUN_TEST(test_addValue);
 
+    
+    printf("\n---Test Getting Sensor Data---\n");
+    RUN_TEST(test_getsensor);
+
+	tearDown();
 
 	return UNITY_END();
 }

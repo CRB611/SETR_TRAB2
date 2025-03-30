@@ -7,9 +7,9 @@ static unsigned int size=3;
 void setUp(void)
 {
 	init();
-	int t[MAX_SIZE]={50};
-	int h[MAX_SIZE]={50};
-	int c[MAX_SIZE]={500};
+	int t[MAX_SIZE]={50,60,40,35,30,25,20,15,10,0,-10,-15,-20,-25,-30,-35,-40,-50,30,33};
+	int h[MAX_SIZE]={50,0,5,10,15,20,25,30,35,40,45,55,60,65,70,75,80,85,90,100};
+	int c[MAX_SIZE]={500,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000};
 
 	setValues(t,h,c);
 	return;
@@ -36,8 +36,7 @@ void test_command_A(void){
 	rxChar('6');	//checksum
 	rxChar('5');	//checksum
 	rxChar('!');	//end
-
-	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
 	
 	//testing the transmission
 	int buff_len=getTxBufferLen();
@@ -52,67 +51,15 @@ void test_command_A(void){
 	rxChar('6');	//checksum
 	rxChar('5');	//checksum
 	rxChar('!');	//end
-	
 	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
 
-	/* not working for now
-	printf("\nnoend");
 	//message without end byte
 	rxChar('#');	//start
 	rxChar('A');	//command
 	rxChar('0');	//checksum
 	rxChar('6');	//checksum
 	rxChar('5');	//checksum
-	
 	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
-*/
-	
-	int t[MAX_SIZE]={-60};
-	int h[MAX_SIZE]={50};
-	int c[MAX_SIZE]={500};
-	setValues(t,h,c);
-
-	//unnaccepted temp value
-	rxChar('#');	//start
-	rxChar('A');	//command
-	rxChar('0');	//checksum
-	rxChar('6');	//checksum
-	rxChar('5');	//checksum
-	rxChar('!');	//end
-	
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
-
-	//unnaccepted humidity value
-	int t2[MAX_SIZE]={30};
-	int h2[MAX_SIZE]={500};
-	int c2[MAX_SIZE]={500};
-	setValues(t2,h2,c2);
-
-	rxChar('#');	//start
-	rxChar('A');	//command
-	rxChar('0');	//checksum
-	rxChar('6');	//checksum
-	rxChar('5');	//checksum
-	rxChar('!');	//end
-	
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
-
-	
-	//unnaccepted co2 value
-	int t3[MAX_SIZE]={30};
-	int h3[MAX_SIZE]={50};
-	int c3[MAX_SIZE]={50};
-	setValues(t3,h3,c3);
-
-	rxChar('#');	//start
-	rxChar('A');	//command
-	rxChar('0');	//checksum
-	rxChar('6');	//checksum
-	rxChar('5');	//checksum
-	rxChar('!');	//end
-	
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
-
 }
 
 void test_nonexistent_cmd(void){
@@ -122,7 +69,6 @@ void test_nonexistent_cmd(void){
 	rxChar('6');	//checksum
 	rxChar('5');	//checksum
 	rxChar('!');	//end
-
 	TEST_ASSERT_EQUAL_INT(INV_COMM,cmdProcessor());
 }
 
@@ -136,8 +82,7 @@ void test_command_P(void){
 	rxChar('6');	//****
 	rxChar('!');	//end
 	rxChar('\0');	//end
-
-	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
 
 	//humidity
 	rxChar('#');	//start
@@ -147,8 +92,7 @@ void test_command_P(void){
 	rxChar('8');	//checksum
 	rxChar('4');	//****
 	rxChar('!');	//end
-
-	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
 
 	//c02
 	rxChar('#');	//start
@@ -158,9 +102,115 @@ void test_command_P(void){
 	rxChar('7');	//checksum
 	rxChar('9');	//****
 	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
 
-	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+	// wrong selection
+	rxChar('#'); // start
+	rxChar('P'); // command
+	rxChar('b'); // argument
+	rxChar('1'); //***
+	rxChar('7'); // checksum
+	rxChar('9'); //****
+	rxChar('!'); // end
+	TEST_ASSERT_EQUAL_INT(NOT_SENSOR, cmdProcessor());
 
+	//message without start byte
+	rxChar('P');	//command	
+	rxChar('c');	//argument
+	rxChar('1');	//*** 
+	rxChar('7');	//checksum
+	rxChar('9');	//****
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
+
+	//message without end byte
+	rxChar('#');	//start
+	rxChar('P');	//command	
+	rxChar('c');	//argument
+	rxChar('1');	//*** 
+	rxChar('7');	//checksum
+	rxChar('9');	//****
+	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
+}
+
+void test_wrong_values(void){
+
+	//unnaccepted temp value
+	int t[MAX_SIZE]={-60};
+	int h[MAX_SIZE]={50};
+	int c[MAX_SIZE]={500};
+	setValues(t,h,c);
+
+	//A
+	rxChar('#');	//start
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+
+	//P
+	rxChar('#');	//start
+	rxChar('P');	//command	
+	rxChar('t');	//argument
+	rxChar('1');	//*** 
+	rxChar('9');	//checksum
+	rxChar('6');	//****
+	rxChar('!');	//end
+	rxChar('\0');	//end
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+
+	//unnaccepted humidity value
+	int t2[MAX_SIZE]={30};
+	int h2[MAX_SIZE]={500};
+	int c2[MAX_SIZE]={500};
+	setValues(t2,h2,c2);
+
+	//A
+	rxChar('#');	//start
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+
+	//P
+	rxChar('#');	//start
+	rxChar('P');	//command	
+	rxChar('h');	//argument
+	rxChar('1');	//*** 
+	rxChar('8');	//checksum
+	rxChar('4');	//****
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+
+	
+	//unnaccepted co2 value
+	int t3[MAX_SIZE]={30};
+	int h3[MAX_SIZE]={50};
+	int c3[MAX_SIZE]={50};
+	setValues(t3,h3,c3);
+
+	//A
+	rxChar('#');	//start
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+
+	//P
+	rxChar('#');	//start
+	rxChar('P');	//command	
+	rxChar('c');	//argument
+	rxChar('1');	//*** 
+	rxChar('7');	//checksum
+	rxChar('9');	//****
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
 }
 
 void test_command_L(void){
@@ -170,8 +220,23 @@ void test_command_L(void){
 	rxChar('7');	//checksum
 	rxChar('6');	//checksum
 	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
 
-	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+	//message without start byte
+	rxChar('L');	//command
+	rxChar('0');	//checksum
+	rxChar('7');	//checksum
+	rxChar('6');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
+
+	//message without end byte
+	rxChar('#');	//start
+	rxChar('L');	//command
+	rxChar('0');	//checksum
+	rxChar('7');	//checksum
+	rxChar('6');	//checksum
+	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
 
 }
 
@@ -181,21 +246,65 @@ void test_command_R(void){
 	rxChar('0');	//checksum
 	rxChar('8');	//checksum
 	rxChar('2');	//checksum
-	rxChar('!');	//end
+	rxChar('!');	//enD
+	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
 
-	TEST_ASSERT_EQUAL_INT(0,cmdProcessor());
+	//message without start byte
+	rxChar('R');	//command
+	rxChar('0');	//checksum
+	rxChar('8');	//checksum
+	rxChar('2');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
+
+	//message without end byte
+	rxChar('#');	//start
+	rxChar('R');	//command
+	rxChar('0');	//checksum
+	rxChar('8');	//checksum
+	rxChar('2');	//checksum
+	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
 
 }
 
 void test_wrong_checksum(void){
+	//A command
+	rxChar('#');	//start
+	rxChar('A');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('6');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(CHECKSUM_BAD,cmdProcessor());
+
+	//P command
+	rxChar('#');	//start
+	rxChar('P');	//command	
+	rxChar('t');	//argument
+	rxChar('1');	//*** 
+	rxChar('2');	//checksum
+	rxChar('6');	//****
+	rxChar('!');	//end
+	rxChar('\0');	//end
+	TEST_ASSERT_EQUAL_INT(CHECKSUM_BAD,cmdProcessor());
+	
+	//R command
 	rxChar('#');	//start
 	rxChar('R');	//command
 	rxChar('0');	//checksum
 	rxChar('4');	//checksum
-	rxChar('2');	//checksum
+	rxChar('5');	//checksum
 	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(CHECKSUM_BAD,cmdProcessor());
 
-	TEST_ASSERT_EQUAL_INT(-7,cmdProcessor());
+	//L command
+	rxChar('#');	//start
+	rxChar('L');	//command
+	rxChar('0');	//checksum
+	rxChar('7');	//checksum
+	rxChar('0');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(CHECKSUM_BAD,cmdProcessor());
 }
 
 void teste_txchar(void){
@@ -285,7 +394,6 @@ void test_char2num(void){
 	TEST_ASSERT_EQUAL_INT(123,numberint);
 }
 
-
 void test_addValue(void){
 	int a[MAX_SIZE]={1,2,3};
 	int expected[MAX_SIZE]={6,1,2,3};
@@ -339,7 +447,6 @@ void test_rbuff(void){
 	
 }	
 
-
 void test_tbuff(void){
 	unsigned char txBuffer[UART_TX_SIZE];
 	TEST_ASSERT_EQUAL_INT(0,getTxBufferLen());
@@ -374,3 +481,40 @@ void test_tbuff(void){
 	TEST_ASSERT_EQUAL_INT(UART_TX_SIZE,buff_len);
 	
 }	
+
+void test_getsensor(void){
+	/*
+	int t_expected[MAX_SIZE]={50,60,40,35,30,25,20,15,10,0,-10,-15,-20,-25,-30,-35,-40,-50,30,33};
+	int h_expected[MAX_SIZE]={50,0,5,10,15,20,25,30,35,40,45,55,60,65,70,75,80,85,90,100};
+	int c_expected[MAX_SIZE]={500,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000};
+
+	
+	//separated functions
+	int *t_got1=get_temp();
+	int *h_got1=get_hum();
+	int *c_got1=get_co2();
+
+	for (int i = 0; i <20; i++)
+	{
+		printf("%d",t_got1[i]);
+	}
+	
+	TEST_ASSERT_EQUAL_INT_ARRAY(t_expected,t_got1,MAX_SIZE);
+	TEST_ASSERT_EQUAL_INT_ARRAY(h_expected,h_got1,MAX_SIZE);
+	TEST_ASSERT_EQUAL_INT_ARRAY(c_expected,c_got1,MAX_SIZE);
+
+	//get_all
+	int t_got2[MAX_SIZE], h_got2[MAX_SIZE], c_got2[MAX_SIZE];
+
+	get_all(t_got2,h_got2,c_got2);*/
+
+	int tfirst_exp=50, cfirst_exp=500, hfirst_exp=50;
+	int tfirst=getFirstTemp();
+	int hfirst=getFirstHum();
+	int cfirst=getFirstco2();
+
+	TEST_ASSERT_EQUAL_INT(tfirst_exp,tfirst);
+	TEST_ASSERT_EQUAL_INT(hfirst_exp,hfirst);
+	TEST_ASSERT_EQUAL_INT(cfirst_exp,cfirst);
+
+}
