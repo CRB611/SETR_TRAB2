@@ -61,6 +61,15 @@ void test_command_L(void);
 void test_command_R(void);
 
 /**
+ * \brief Tests the command 'R' checking the start byte using UNITY
+ */
+void test_command_R_START_BYTE(void);
+/**
+ * \brief Tests the command 'R'checking the end byte using UNITY
+ */
+void test_command_R_END_BYTE(void);
+
+/**
  * \brief Tests the occurrence of a nonexistent command being sent
  */
 void test_nonexistent_cmd(void);

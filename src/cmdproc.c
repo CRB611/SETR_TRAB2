@@ -344,8 +344,8 @@ int cmdProcessor(void)
 					}
 					
 					/* Check checksum */
-					int chk = calcChecksum(&UARTRxBuffer[i+1], 6); // inclui o tipo, sinal e valor
-					int chk_recv = char2num(&UARTRxBuffer[i+7], 3); // os três dígitos ASCII
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 6); // 'P' até ao último dígito de valor
+					int chk_recv = char2num(&UARTRxBuffer[i+7], 3); // posições 7,8,9
 					
 					if (chk != chk_recv) {
 						return CHECKSUM_BAD;
@@ -375,7 +375,7 @@ int cmdProcessor(void)
 						return EOF_ERROR;
 					}
 				
-					int chk = calcChecksum(&UARTRxBuffer[i+1], 7); // 'P', 'c', '+', d1, d2, d3, d4, d5
+					int chk = calcChecksum(&UARTRxBuffer[i+1],8); // 'P', 'c', '+', d1, d2, d3, d4, d5
 					int chk_recv = char2num(&UARTRxBuffer[i+9], 3);
 				
 					if (chk != chk_recv) {
@@ -567,19 +567,22 @@ int cmdProcessor(void)
 
 			}	
 			case 'L':
-			{			
-				if (UARTRxBuffer[i+8] != EOF_SYM) {
+			{
+				// 1. Verifica se a mensagem termina com '!' no sítio certo
+				if (UARTRxBuffer[i+5] != EOF_SYM) {
 					eraseRxBuff(rxBufLen);
 					return EOF_ERROR;
 				}
 				
-				int chk = calcChecksum(&UARTRxBuffer[i+1], 1); // só 'L'
-				int chk_recv = char2num(&UARTRxBuffer[i+5], 3); // três dígitos ASCII
+				// 2. Checksum: calcula e compara
+				int chk = calcChecksum(&UARTRxBuffer[i+1], 1); // só o 'L'
+				int chk_recv = char2num(&UARTRxBuffer[i+2], 3); // posições i+2, i+3, i+4
 
 				if (chk != chk_recv) {
 					return CHECKSUM_BAD;
 				}
-				// Envio de Temperatura ,20 valores visto que o array so tem 20 posicoes
+
+				// 3. Envia as amostras de Temperatura
 				for (i = 0; i < index_temp; i++) {
 					txChar('t');
 					unsigned char temp_ascii[4];
@@ -590,33 +593,34 @@ int cmdProcessor(void)
 					txChar(temp_ascii[3]);
 				}	
 
-				// Envio de Humidade ,20 valores visto que o array so tem 20 posicoes
+				// 4. Envia as amostras de Humidade
 				for (i = 0; i < index_hum; i++) {
 					txChar('h');
 					unsigned char hum_ascii[4];
 					num2char(hum_ascii, hum[i], 'h');
-					txChar(hum_ascii[0]); // '+' ou '-'
+					txChar(hum_ascii[0]); // ASCII direto
 					txChar(hum_ascii[1]);
 					txChar(hum_ascii[2]);
 					txChar(hum_ascii[3]);
 				}	
-				
 
-				// Envio de CO2 ,20 valores visto que o array so tem 20 posicoes
+				// 5. Envia as amostras de CO₂
 				for (i = 0; i < index_co2; i++) {
-					txChar('h');
-					unsigned char CO2_ascii[4];
-					num2char(CO2_ascii, co2[i], 'h');
-					txChar(CO2_ascii[0]); // '+' ou '-'
-					txChar(CO2_ascii[1]);
-					txChar(CO2_ascii[2]);
-					txChar(CO2_ascii[3]);
+					txChar('c');
+					unsigned char co2_ascii[5];
+					num2char(co2_ascii, co2[i], 'c');
+					txChar(co2_ascii[0]);
+					txChar(co2_ascii[1]);
+					txChar(co2_ascii[2]);
+					txChar(co2_ascii[3]);
+					txChar(co2_ascii[4]);
 				}	
 
+				// 6. Limpa o buffer e termina
 				eraseRxBuff(rxBufLen);
-
 				return END;
 			}
+
 			case 'R':
 			{
 				// 1. Verifica EOF
@@ -624,6 +628,11 @@ int cmdProcessor(void)
 				{
 					eraseRxBuff(rxBufLen);
 					return EOF_ERROR;
+				}
+				if (UARTRxBuffer[i] != SOF_SYM)
+				{
+					eraseRxBuff(rxBufLen);
+					return SOF_ERROR;
 				}
 
 				// 2. Verifica checksum

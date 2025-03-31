@@ -32,7 +32,18 @@ int main(void)
     RUN_TEST(test_command_R);
     RUN_TEST(test_nonexistent_cmd);
     RUN_TEST(test_wrong_values);
-    
+
+// ============================
+// 📌 Testes ao comando 'R'
+// ============================
+    printf("\n========== Testes ao Comando 'R' ==========\n");
+
+    RUN_TEST(test_command_R);                // Comando correto
+    RUN_TEST(test_command_R_START_BYTE);     // Falta do símbolo de início
+    RUN_TEST(test_command_R_END_BYTE);       // Falta do símbolo de fim
+
+    printf("===========================================\n\n");
+ 
     printf("\n---Test checksum---\n");
     RUN_TEST(test_wrong_checksum);
 

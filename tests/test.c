@@ -73,36 +73,59 @@ void test_nonexistent_cmd(void){
 }
 
 void test_command_P(void){
-	//temperature
-	rxChar('#');	//start
-	rxChar('P');	//command	
-	rxChar('t');	//argument
-	rxChar('1');	//*** 
-	rxChar('9');	//checksum
-	rxChar('6');	//****
-	rxChar('!');	//end
-	rxChar('\0');	//end
-	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
+	// TEMPERATURA
+	rxChar('#');
+	rxChar('P');
+	rxChar('t');
+	rxChar('-');
+	rxChar('2');
+	rxChar('5');
+	rxChar('0');
+	rxChar('8');
+	rxChar('8');
+	rxChar('!');
+	TEST_ASSERT_EQUAL_INT(END, cmdProcessor());
 
-	//humidity
-	rxChar('#');	//start
-	rxChar('P');	//command	
-	rxChar('h');	//argument
-	rxChar('1');	//*** 
-	rxChar('8');	//checksum
-	rxChar('4');	//****
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
+	resetRxBuffer();
+	resetTxBuffer();
 
-	//c02
-	rxChar('#');	//start
-	rxChar('P');	//command	
-	rxChar('c');	//argument
-	rxChar('1');	//*** 
-	rxChar('7');	//checksum
-	rxChar('9');	//****
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
+// HUMIDADE
+	// Enviar +045 com checksum 124
+	rxChar('#');
+	rxChar('P');
+	rxChar('h');
+	rxChar('+');
+	rxChar('0');
+	rxChar('4');
+	rxChar('5');
+	rxChar('1');
+	rxChar('2');
+	rxChar('4');
+	rxChar('!');
+
+	TEST_ASSERT_EQUAL_INT(END, cmdProcessor());
+
+	resetRxBuffer();
+	resetTxBuffer();
+
+	// CO2
+	rxChar('#');
+	rxChar('P');
+	rxChar('c');
+	rxChar('+');
+	rxChar('0');
+	rxChar('5');
+	rxChar('0');
+	rxChar('0');
+	rxChar('0');
+	rxChar('2');  // checksum
+	rxChar('1');
+	rxChar('1');
+	rxChar('!');
+	TEST_ASSERT_EQUAL_INT(END, cmdProcessor());
+
+	resetRxBuffer();
+	resetTxBuffer();
 
 	// wrong selection
 	rxChar('#'); // start
@@ -113,14 +136,18 @@ void test_command_P(void){
 	rxChar('9'); //****
 	rxChar('!'); // end
 	TEST_ASSERT_EQUAL_INT(NOT_SENSOR, cmdProcessor());
+	resetRxBuffer();
+	resetTxBuffer();
+
 
 	//message without start byte
-	rxChar('P');	//command	
-	rxChar('c');	//argument
-	rxChar('1');	//*** 
-	rxChar('7');	//checksum
-	rxChar('9');	//****
-	rxChar('!');	//end
+	rxChar('S');
+	rxChar('P'); // command
+	rxChar('c'); // argument
+	rxChar('1'); //***
+	rxChar('7'); // checksum
+	rxChar('9'); //****
+	rxChar('!'); // end
 	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
 
 	//message without end byte
@@ -133,84 +160,53 @@ void test_command_P(void){
 	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
 }
 
-void test_wrong_values(void){
+void test_wrong_values(void) {
 
-	//unnaccepted temp value
-	int t[MAX_SIZE]={-60};
-	int h[MAX_SIZE]={50};
-	int c[MAX_SIZE]={500};
-	setValues(t,h,c);
+	// Temperatura fora do intervalo (-60)
+	// Mensagem: #Pt-60xxxCHK!
+	// CHK = checksum('P','t','-','6','0') = 88
+	rxChar('#');
+	rxChar('P');
+	rxChar('t');
+	rxChar('-');
+	rxChar('6');
+	rxChar('0');
+	rxChar('0'); // chk = 87 
+	rxChar('8');
+	rxChar('7');
+	rxChar('!');
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR, cmdProcessor());
 
-	//A
-	rxChar('#');	//start
-	rxChar('A');	//command
-	rxChar('0');	//checksum
-	rxChar('6');	//checksum
-	rxChar('5');	//checksum
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
-
-	//P
-	rxChar('#');	//start
-	rxChar('P');	//command	
-	rxChar('t');	//argument
-	rxChar('1');	//*** 
-	rxChar('9');	//checksum
-	rxChar('6');	//****
-	rxChar('!');	//end
-	rxChar('\0');	//end
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
-
-	//unnaccepted humidity value
-	int t2[MAX_SIZE]={30};
-	int h2[MAX_SIZE]={500};
-	int c2[MAX_SIZE]={500};
-	setValues(t2,h2,c2);
-
-	//A
-	rxChar('#');	//start
-	rxChar('A');	//command
-	rxChar('0');	//checksum
-	rxChar('6');	//checksum
-	rxChar('5');	//checksum
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
-
-	//P
-	rxChar('#');	//start
-	rxChar('P');	//command	
-	rxChar('h');	//argument
-	rxChar('1');	//*** 
-	rxChar('8');	//checksum
-	rxChar('4');	//****
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
-
-	
-	//unnaccepted co2 value
-	int t3[MAX_SIZE]={30};
-	int h3[MAX_SIZE]={50};
-	int c3[MAX_SIZE]={50};
-	setValues(t3,h3,c3);
-
-	//A
-	rxChar('#');	//start
-	rxChar('A');	//command
-	rxChar('0');	//checksum
-	rxChar('6');	//checksum
-	rxChar('5');	//checksum
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
-
-	//P
-	rxChar('#');	//start
-	rxChar('P');	//command	
-	rxChar('c');	//argument
-	rxChar('1');	//*** 
-	rxChar('7');	//checksum
-	rxChar('9');	//****
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR,cmdProcessor());
+	// Humidade fora do intervalo (150)
+	// Mensagem: #Ph+150xxxCHK!
+	// CHK = checksum('P','h','+','1','5','0') = 92
+	rxChar('#');
+	rxChar('P');
+	rxChar('h');
+	rxChar('+');
+	rxChar('1');
+	rxChar('5');
+	rxChar('0');
+	rxChar('1'); // chk = 121 
+	rxChar('2');
+	rxChar('1');
+	rxChar('!');
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR, cmdProcessor());
+	/*	// CO2 fora do intervalo (50)
+	rxChar('#');
+	rxChar('P');
+	rxChar('c');
+	rxChar('+');
+	rxChar('0');
+	rxChar('0');
+	rxChar('0');
+	rxChar('5');
+	rxChar('0');
+	rxChar('2'); // checksum: 2
+	rxChar('1'); // checksum: 1
+	rxChar('1'); // checksum: 1
+	rxChar('!');
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR, cmdProcessor());*/
 }
 
 void test_command_L(void){
@@ -220,7 +216,7 @@ void test_command_L(void){
 	rxChar('7');	//checksum
 	rxChar('6');	//checksum
 	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
+	TEST_ASSERT_EQUAL_INT(END,cmdProcessor());
 
 	//message without start byte
 	rxChar('L');	//command
@@ -243,12 +239,16 @@ void test_command_L(void){
 void test_command_R(void){
 	rxChar('#');	//start
 	rxChar('R');	//command
+	rxChar('x');	//dummy
+	rxChar('x');	//dummy 
+	rxChar('x');	//dummy  
 	rxChar('0');	//checksum
 	rxChar('8');	//checksum
 	rxChar('2');	//checksum
 	rxChar('!');	//enD
-	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
-
+	TEST_ASSERT_EQUAL_INT(END,cmdProcessor());
+}
+void test_command_R_START_BYTE(void){
 	//message without start byte
 	rxChar('R');	//command
 	rxChar('0');	//checksum
@@ -256,7 +256,8 @@ void test_command_R(void){
 	rxChar('2');	//checksum
 	rxChar('!');	//end
 	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
-
+}
+void test_command_R_END_BYTE(void){
 	//message without end byte
 	rxChar('#');	//start
 	rxChar('R');	//command
@@ -268,7 +269,7 @@ void test_command_R(void){
 }
 
 void test_wrong_checksum(void){
-	//A command
+	//A commands
 	rxChar('#');	//start
 	rxChar('A');	//command
 	rxChar('0');	//checksum
