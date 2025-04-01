@@ -156,19 +156,19 @@ unsigned int char2num(unsigned char ascii [], int length);
   * \brief Get the temperature array
   * \return The pointer for the temperature array
   */
- int* get_temp(void);
+ void get_temp(int *t);
  
  /**
   * \brief Get the humidity array
   * \return The pointer for the humidity array
   */
- int* get_hum(void);
+ void get_hum(int *h);
  
  /**
   * \brief Get the CO2 array
   * \return The pointer for the CO2 array
   */
- int* get_co2(void);
+ void get_co2(int *c);
  
  /**
   * \brief Get the temp,hum,co2 arrays
