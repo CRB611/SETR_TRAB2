@@ -357,7 +357,6 @@ int cmdProcessor(void)
 					int chk = calcChecksum(&UARTRxBuffer[i+1], k-4); // inclui o tipo, sinal e valor
 					int chk_recv = char2num(&UARTRxBuffer[k-3], 3); // os três dígitos ASCII
 				
-					
 					//verificar a checksum
 					if (chk != chk_recv) {
 						return CHECKSUM_BAD;
