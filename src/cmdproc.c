@@ -165,33 +165,7 @@ int init(void){
 		return NOT_EMPTY;//Não vazio	
 	}
 }
-/*
-Get Temp
-*/
-int* get_temp(void){
 
-	return temp;
-}
-/*
-Get HUm
-*/
-int* get_hum(void){
-	return hum;
-}
-/*
-Get CO2
-*/
-int* get_co2(void){
-	return co2;
-}
-/*
-Get ALL (Temp,HUm,Co2)
-*/
-void get_all(int *t, int *h, int *c){
-	t=get_temp();
-	h=get_hum();
-	c=get_co2();
-}
 
 /*
 Get Temp first 
@@ -503,68 +477,7 @@ int cmdProcessor(void)
 				return OK;
 
 
-			/*
-				while (*sid != EOF_SYM) {
-					if (*sid == 't') {
-						T = 10 * (*(sid+2) - '0') + (*(sid+3) - '0');
-						if (*(sid+1) == '-') T = -T;
 			
-						if (T < -50 || T > 60) {
-							eraseRxBuff(rxBufLen);
-							return VALUES_ERROR;
-						}
-			
-						sid += 4; // avançar 4 posições: t + sinal + 2 dígitos
-					}
-					else if(*sid == 'h'){
-
-						H=100*(*(sid+1)-'0')+10*(*(sid+2)-'0'+(*(sid+3)-'0'));
-						
-						if (H>100 || H<0)
-						{
-							eraseRxBuff(rxBufLen);
-							return VALUES_ERROR;
-						}
-					sid+=4;
-					
-					
-					}
-					else if(*sid == 'c'){
-						C=10000*(*(sid+1)-'0')+1000*(*(sid+2)-'0')+100*(*(sid+3)-'0')+10*(*(sid+4)-'0')+(*(sid+5)-'0');
-						
-						
-						
-						if (C < 400 || C > 20000) {
-							eraseRxBuff(rxBufLen);
-							return VALUES_ERROR;
-						}
-
-
-					sid+=6;	
-
-					} else{
-						sid+=3;
-						return INV_COMM;
-					}
-					
-				}
-				addValue(temp,&index_temp,T);
-				addValue(hum,&index_hum,H);
-				addValue(co2,&index_co2,C);
-
-				for (int i = 0; i < rxBufLen; i++)
-				{
-					txChar((unsigned char)(UARTRxBuffer[i]));
-				}
-				
-				num2char(&UARTTxBuffer[txBufLen-3],chk,3);
-				
-				
-
-				eraseRxBuff(rxBufLen);
-				return END;
-				*/
-
 			}	
 			case 'L':
 			{

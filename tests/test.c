@@ -192,7 +192,7 @@ void test_wrong_values(void) {
 	rxChar('1');
 	rxChar('!');
 	TEST_ASSERT_EQUAL_INT(VALUES_ERROR, cmdProcessor());
-	/*	// CO2 fora do intervalo (50)
+		// CO2 fora do intervalo (50)
 	rxChar('#');
 	rxChar('P');
 	rxChar('c');
@@ -206,7 +206,7 @@ void test_wrong_values(void) {
 	rxChar('1'); // checksum: 1
 	rxChar('1'); // checksum: 1
 	rxChar('!');
-	TEST_ASSERT_EQUAL_INT(VALUES_ERROR, cmdProcessor());*/
+	TEST_ASSERT_EQUAL_INT(VALUES_ERROR, cmdProcessor());
 }
 
 void test_command_L(void){
@@ -484,30 +484,7 @@ void test_tbuff(void){
 }	
 
 void test_getsensor(void){
-	/*
-	int t_expected[MAX_SIZE]={50,60,40,35,30,25,20,15,10,0,-10,-15,-20,-25,-30,-35,-40,-50,30,33};
-	int h_expected[MAX_SIZE]={50,0,5,10,15,20,25,30,35,40,45,55,60,65,70,75,80,85,90,100};
-	int c_expected[MAX_SIZE]={500,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000};
 
-	
-	//separated functions
-	int *t_got1=get_temp();
-	int *h_got1=get_hum();
-	int *c_got1=get_co2();
-
-	for (int i = 0; i <20; i++)
-	{
-		printf("%d",t_got1[i]);
-	}
-	
-	TEST_ASSERT_EQUAL_INT_ARRAY(t_expected,t_got1,MAX_SIZE);
-	TEST_ASSERT_EQUAL_INT_ARRAY(h_expected,h_got1,MAX_SIZE);
-	TEST_ASSERT_EQUAL_INT_ARRAY(c_expected,c_got1,MAX_SIZE);
-
-	//get_all
-	int t_got2[MAX_SIZE], h_got2[MAX_SIZE], c_got2[MAX_SIZE];
-
-	get_all(t_got2,h_got2,c_got2);*/
 
 	int tfirst_exp=50, cfirst_exp=500, hfirst_exp=50;
 	int tfirst=getFirstTemp();
