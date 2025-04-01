@@ -12,7 +12,7 @@ static unsigned char UARTRxBuffer[UART_RX_SIZE];
 static unsigned char rxBufLen = 0; 
 
 static unsigned char UARTTxBuffer[UART_TX_SIZE];
-static unsigned char txBufLen = 0; 
+static unsigned int txBufLen = 0; 
 static unsigned  index_hum; 
 static int hum[MAX_SIZE];
 static unsigned  index_temp; 
@@ -200,7 +200,7 @@ int getFirstco2(void){
 Seting the sensor arrays for emulation porposes
 */
 void setValues(int t[MAX_SIZE], int h[MAX_SIZE], int c[MAX_SIZE]){
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < MAX_SIZE; i++)
 	{
 		temp[i] = t[i];
 		hum[i] = h[i];
@@ -578,39 +578,46 @@ int cmdProcessor(void)
 				txChar('t');
 
 				// 3. Envia as amostras de Temperatura
-				int t[MAX_SIZE];
-				get_temp(&t[0]);
-				
-				for (i = 0; i < 5; i++) {
-					unsigned char temp_ascii[4];
+				int tget[MAX_SIZE];
+				get_temp(&tget[0]);
+
+				printf("t");
+				for (i = 0; i < 20; i++) {
+					unsigned char temp_ascii[3];
 					num2char(&temp_ascii[0], temp[i], 't');
 					txChar(temp_ascii[0]); // '+' ou '-'
 					txChar(temp_ascii[1]);
-					//txChar(temp_ascii[2]);
+					txChar(temp_ascii[2]);
 				}	
-
+			
 				// 4. Envia as amostras de Humidade
-				for (i = 0; i < index_hum; i++) {
-					txChar('h');
-					unsigned char hum_ascii[4];
-					num2char(hum_ascii, hum[i], 'h');
-					txChar(hum_ascii[0]); // ASCII direto
+				txChar('h');
+				int h[MAX_SIZE];
+				get_hum(&h[0]);
+				
+				for (i = 0; i < 20; i++) {
+					unsigned char hum_ascii[3];
+					num2char(&hum_ascii[0], hum[i], 'h');
+					txChar(hum_ascii[0]); // '+' ou '-'
 					txChar(hum_ascii[1]);
 					txChar(hum_ascii[2]);
-					txChar(hum_ascii[3]);
 				}	
 
-				// 5. Envia as amostras de CO₂
-				for (i = 0; i < index_co2; i++) {
-					txChar('c');
+				// 4. Envia as amostras de co2
+				txChar('c');
+				int c[MAX_SIZE];
+				get_co2(&c[0]);
+				
+				for (i = 0; i < 20; i++) {
 					unsigned char co2_ascii[5];
-					num2char(co2_ascii, co2[i], 'c');
-					txChar(co2_ascii[0]);
+					num2char(&co2_ascii[0], co2[i], 'c');
+					txChar(co2_ascii[0]); // '+' ou '-'
 					txChar(co2_ascii[1]);
 					txChar(co2_ascii[2]);
 					txChar(co2_ascii[3]);
 					txChar(co2_ascii[4]);
 				}	
+				txChar('!');
 
 				// 6. Limpa o buffer e termina
 				eraseRxBuff(rxBufLen);

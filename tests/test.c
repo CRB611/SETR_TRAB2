@@ -8,7 +8,7 @@ void setUp(void)
 {
 	init();
 	int t[MAX_SIZE]={50,60,40,35,30,25,20,15,10,0,-10,-15,-20,-25,-30,-35,-40,-50,30,33};
-	int h[MAX_SIZE]={50,0,5,10,15,20,25,30,35,40,45,55,60,65,70,75,80,85,90,100};
+	int h[MAX_SIZE]={50,2,5,10,15,20,25,30,35,40,45,55,60,65,70,75,80,85,90,100};
 	int c[MAX_SIZE]={500,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000};
 
 	setValues(t,h,c);
@@ -27,7 +27,7 @@ void test_cmdproc_init(void)
 }
 
 void test_command_A(void){
-	unsigned char txBuffer[UART_RX_SIZE];
+	unsigned char txBuffer[UART_TX_SIZE];
 
 	//normal test, everything is supposed to be alright
 	rxChar('#');	//start
@@ -73,7 +73,7 @@ void test_nonexistent_cmd(void){
 }
 
 void test_command_P(void){
-	unsigned char txBuffer[UART_RX_SIZE];
+	unsigned char txBuffer[UART_TX_SIZE];
 
 	// TEMPERATURA
 	rxChar('#');
@@ -238,7 +238,7 @@ void test_wrong_values(void) {
 }
 
 void test_command_L(void){
-	//unsigned char txBuffer[UART_RX_SIZE];
+	unsigned char txBuffer[UART_TX_SIZE];
 
 	rxChar('#');	//start
 	rxChar('L');	//command
@@ -248,15 +248,14 @@ void test_command_L(void){
 	rxChar('!');	//end
 	TEST_ASSERT_EQUAL_INT(END,cmdProcessor());
 
-	/*int buff_len=getTxBufferLen();
+	int buff_len=getTxBufferLen();
 	getTxBuffer(txBuffer,&buff_len);
-	unsigned char expected[]={'#','P','t','+','5','0','1','9','3','!'};
+	
+	//expected output for this command
+	unsigned char expected[]="#Lt+50+60+40+35+30+25+20+15+10+00-10-15-20-25-30-35-40-50+30+33h050002005010015020025030035040045055060065070075080085090100c0050002000030000400005000060000700008000090001000011000120001300014000150001600017000180001900020000!"; //temp, byte 2..63
 
-	for (unsigned long int i = 0; i < buff_len; i++)
-	{
-		printf("%c",txBuffer);
-	}
-	*/
+	TEST_ASSERT_EQUAL_CHAR_ARRAY(expected,txBuffer,buff_len);
+	
 
 	//message without start byte
 	rxChar('L');	//command
@@ -523,7 +522,7 @@ void test_tbuff(void){
 
 void test_getsensor(void){
 	int t[MAX_SIZE]={50,60,40,35,30,25,20,15,10,0,-10,-15,-20,-25,-30,-35,-40,-50,30,33};
-	int h[MAX_SIZE]={50,0,5,10,15,20,25,30,35,40,45,55,60,65,70,75,80,85,90,100};
+	int h[MAX_SIZE]={50,2,5,10,15,20,25,30,35,40,45,55,60,65,70,75,80,85,90,100};
 	int c[MAX_SIZE]={500,2000,3000,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000,16000,17000,18000,19000,20000};
 
 	setValues(t,h,c);
@@ -537,10 +536,12 @@ void test_getsensor(void){
 	TEST_ASSERT_EQUAL_INT(hfirst_exp,hfirst);
 	TEST_ASSERT_EQUAL_INT(cfirst_exp,cfirst);
 
+	setValues(t,h,c);
+
 	int tget[MAX_SIZE],hget[MAX_SIZE],cget[MAX_SIZE];
 	get_temp(&tget[0]);
 	get_hum(&hget[0]);
-	get_co2(&cget[0]);
+	get_co2(&cget[0]);	
 
 	TEST_ASSERT_EQUAL_INT_ARRAY(t,tget,MAX_SIZE);
 	TEST_ASSERT_EQUAL_INT_ARRAY(h,hget,MAX_SIZE);

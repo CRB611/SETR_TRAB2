@@ -33,7 +33,7 @@
  /* E.g. #define CMD_EMPTY_STRING -1                      */
  #define MAX_SIZE 20
  #define UART_RX_SIZE 30 	///< Maximum size of the RX buffer  
- #define UART_TX_SIZE 30 	///< Maximum size of the TX buffer 
+ #define UART_TX_SIZE 300 	///< Maximum size of the TX buffer 
  #define SOF_SYM '#'	        ///< Start of Frame Symbol
  #define EOF_SYM '!'         ///< End of Frame Symbol 
  #define EOF_ERROR -10       ///< End of frame error status code
