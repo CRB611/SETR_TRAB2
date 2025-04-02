@@ -40,12 +40,14 @@ int main(void)
     tearDown();
 
     // Impressão em formato de tabela
-    printf("\n======================= RELATÓRIO FINAL ==========\n");
+    printf("\n================= RELATÓRIO FINAL ================\n");
     printf("| %-35s | %-8s |\n", "TESTE", "ESTADO");
     printf("--------------------------------------------------\n");
     for (int i = 0; i < test_count; i++) {
         printf("| %-35s | %-8s |\n", test_names[i], test_results[i]);
     }
+    printf("==================================================\n");
+    printf("|Número de testes: %d                            |\n",test_count);
     printf("==================================================\n");
     
     return UNITY_END();
