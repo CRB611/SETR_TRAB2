@@ -2,8 +2,8 @@
 
 @mainpage SETR Trabalho 2 - Doubly Linked List (DLL)
 
-@brief This is our second assignment for our "Sistemas Embutidos e de Tempo Real" course, whit the intention of aquainting us with unit testing, 
-we were asked to make a module that is responsible for conecting three sensors (Temperature, Humidity and C0<sub>2</sub>) to a device using UARTA transmission.
+@brief This is our second assignment for our "Sistemas Embutidos e de Tempo Real" course, whit the intention of aquainting us with unit testing,
+we were asked to make a module that is responsible for conecting three sensors (Temperature, Humidity and C0<sub>2</sub>) to a device using UART transmission.
 This communication is made in ASCII and each command consists of:
 <ul>
     <li><b>'#':</b> A char representing the start of the frame; </li>
@@ -13,12 +13,18 @@ This communication is made in ASCII and each command consists of:
     <li><b>The checksum:</b> The sum of the numerical value of the command and the data bytes, the number is sent in three chars. </li>
 </ul>
 
-Ins this project we were also asked to emulate the UART connection.
+In this project we were also asked to emulate the UART connection.
 
 @details 
 <b>Features</b><br>
 <ul>
-    <li><i>blabla:</i> blabla </li>
+    <li><i>Initialization:</i> Initializing the whole module and simulation. </li>
+    <li><i>Command Processing: </i> The possible commands are all correctly processed. </li>
+    <li><i>Buffer Management:</i> Various functions to add, get or read data from the buffers.</li>
+    <li><i>Collection of data from sensors:</i> Functions to aquire the sensor data. </li>
+    <li><i>Number to character conversions, and vice-versa:</i> The integer to char and char to integer conversion is guaranteed. </li>
+    <li><i>UART and Sensor Emulation functions:</i> Functions to assure a correct UART and sensor emulation. </li>
+    <li><i>UNITY Testing:</i> A total of 17 tests are done using the UNITY engine. </li>
 </ul>
 
 <b>File Structure:</b><br>
@@ -47,14 +53,17 @@ To use this module run the make command on the main folder, this will generate t
 After the main executable is generated run ./main to execute.
 
 <b>Test scenarios covered:</b><br>
+A total of 17 tests are done, these tests cover the following areas:
 <ul>
     <li><i>Initialization:</i> Initialization of the module.</li>
     <li><i>Command processing:</i> Each command is tested, including occurences where a wrong command or data is sent</li>
     <li><i>Checksum:</i> The checksum is tested.</li>
     <li><i>Convertion:</i> The ASCII to int and int to ASCII conversions are also tested.</li>
     <li><i>Buffers:</i> Buffer processes like adding elements and geting data are tested.</li>
+    <li><i>Sensor Data:</i> The functions to get the data from the sensors are tested, as well as the ocasions where unaccepted data is aquired.</li>
 </ul>
 
-@author Celina Brito
-@author Simão Ribeiro
+
+@author Celina Brito, 104995
+@author Simão Ribeiro, 104081
 */

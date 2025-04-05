@@ -17,7 +17,7 @@
  * 
  * \author Simão Ribeiro
  * \author Celina Brito
- * \date 1/4/2025
+ * \date 8/4/2025
  * \bug There are no known bugs.
  *
  * \defgroup C Module

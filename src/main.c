@@ -17,7 +17,7 @@
  * The test result summary is printed in a formatted table after all tests are executed.
  *
  * @author Simão Ribeiro
- * @date 2025-04-01
+ * @date 2025-04-08
  *
  * @bug No known bugs.
  *

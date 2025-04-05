@@ -8,7 +8,7 @@
  * 
  * \author Simão Ribeiro
  * \author Celina Brito
- * \date 1/4/2025
+ * \date 8/4/2025
  * \bug There are no known bugs.
  *
  * \defgroup test
@@ -79,16 +79,6 @@ void test_command_A(void){
 	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
 }
 
-void test_nonexistent_cmd(void){
-	rxChar('#');	//start
-	rxChar('C');	//command
-	rxChar('0');	//checksum
-	rxChar('6');	//checksum
-	rxChar('5');	//checksum
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(INV_COMM,cmdProcessor());
-}
-
 void test_command_P(void){
 	// TEMPERATURA
 	rxChar('#');
@@ -156,7 +146,6 @@ void test_command_P(void){
 	resetRxBuffer();
 	resetTxBuffer();
 
-
 	//message without start byte
 	rxChar('S');
 	rxChar('P'); // command
@@ -175,6 +164,72 @@ void test_command_P(void){
 	rxChar('7');	//checksum
 	rxChar('9');	//****
 	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
+}
+
+void test_command_L(void){
+	rxChar('#');	//start
+	rxChar('L');	//command
+	rxChar('0');	//checksum
+	rxChar('7');	//checksum
+	rxChar('6');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(END,cmdProcessor());
+
+	//message without start byte
+	rxChar('L');	//command
+	rxChar('0');	//checksum
+	rxChar('7');	//checksum
+	rxChar('6');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
+
+	//message without end byte
+	rxChar('#');	//start
+	rxChar('L');	//command
+	rxChar('0');	//checksum
+	rxChar('7');	//checksum
+	rxChar('6');	//checksum
+	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
+
+}
+
+void test_command_R(void){
+	rxChar('#');	//start
+	rxChar('R');	//command
+	rxChar('x');	//dummy
+	rxChar('x');	//dummy 
+	rxChar('x');	//dummy  
+	rxChar('0');	//checksum
+	rxChar('8');	//checksum
+	rxChar('2');	//checksum
+	rxChar('!');	//enD
+	TEST_ASSERT_EQUAL_INT(END,cmdProcessor());
+
+	//message without start byte
+	rxChar('R');	//command
+	rxChar('0');	//checksum
+	rxChar('8');	//checksum
+	rxChar('2');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
+
+	//message without end byte
+	rxChar('#');	//start
+	rxChar('R');	//command
+	rxChar('0');	//checksum
+	rxChar('8');	//checksum
+	rxChar('2');	//checksum
+	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
+}
+
+void test_nonexistent_cmd(void){
+	rxChar('#');	//start
+	rxChar('C');	//command
+	rxChar('0');	//checksum
+	rxChar('6');	//checksum
+	rxChar('5');	//checksum
+	rxChar('!');	//end
+	TEST_ASSERT_EQUAL_INT(INV_COMM,cmdProcessor());
 }
 
 void test_wrong_values(void) {
@@ -224,65 +279,6 @@ void test_wrong_values(void) {
 	rxChar('1'); // checksum: 1
 	rxChar('!');
 	TEST_ASSERT_EQUAL_INT(VALUES_ERROR, cmdProcessor());
-}
-
-void test_command_L(void){
-	rxChar('#');	//start
-	rxChar('L');	//command
-	rxChar('0');	//checksum
-	rxChar('7');	//checksum
-	rxChar('6');	//checksum
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(END,cmdProcessor());
-
-	//message without start byte
-	rxChar('L');	//command
-	rxChar('0');	//checksum
-	rxChar('7');	//checksum
-	rxChar('6');	//checksum
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
-
-	//message without end byte
-	rxChar('#');	//start
-	rxChar('L');	//command
-	rxChar('0');	//checksum
-	rxChar('7');	//checksum
-	rxChar('6');	//checksum
-	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
-
-}
-
-void test_command_R(void){
-	rxChar('#');	//start
-	rxChar('R');	//command
-	rxChar('x');	//dummy
-	rxChar('x');	//dummy 
-	rxChar('x');	//dummy  
-	rxChar('0');	//checksum
-	rxChar('8');	//checksum
-	rxChar('2');	//checksum
-	rxChar('!');	//enD
-	TEST_ASSERT_EQUAL_INT(END,cmdProcessor());
-}
-void test_command_R_START_BYTE(void){
-	//message without start byte
-	rxChar('R');	//command
-	rxChar('0');	//checksum
-	rxChar('8');	//checksum
-	rxChar('2');	//checksum
-	rxChar('!');	//end
-	TEST_ASSERT_EQUAL_INT(SOF_ERROR,cmdProcessor());
-}
-void test_command_R_END_BYTE(void){
-	//message without end byte
-	rxChar('#');	//start
-	rxChar('R');	//command
-	rxChar('0');	//checksum
-	rxChar('8');	//checksum
-	rxChar('2');	//checksum
-	TEST_ASSERT_EQUAL_INT(EOF_ERROR,cmdProcessor());
-
 }
 
 void test_wrong_checksum(void){
@@ -412,21 +408,6 @@ void test_char2num(void){
 	TEST_ASSERT_EQUAL_INT(123,numberint);
 }
 
-void test_addValue(void){
-	int a[MAX_SIZE]={1,2,3};
-	int expected[MAX_SIZE]={6,1,2,3};
-	addValue(a,&size,6);
-
-	TEST_ASSERT_EQUAL_INT_ARRAY(expected,a,4);
-	
-	int b[MAX_SIZE]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-	int expectedb[MAX_SIZE]={14,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
-	
-	addValue(b,&size,14);
-
-	TEST_ASSERT_EQUAL_INT_ARRAY(expectedb,b,4);	
-}
-
 void test_rbuff(void){
 	unsigned char rxBuffer[UART_RX_SIZE];
 	
@@ -500,8 +481,22 @@ void test_tbuff(void){
 	
 }	
 
-void test_getsensor(void){
+void test_addValue(void){
+	int a[MAX_SIZE]={1,2,3};
+	int expected[MAX_SIZE]={6,1,2,3};
+	addValue(a,&size,6);
 
+	TEST_ASSERT_EQUAL_INT_ARRAY(expected,a,4);
+	
+	int b[MAX_SIZE]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+	int expectedb[MAX_SIZE]={14,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
+	
+	addValue(b,&size,14);
+
+	TEST_ASSERT_EQUAL_INT_ARRAY(expectedb,b,4);	
+}
+
+void test_getsensor(void){
 
 	int tfirst_exp=50, cfirst_exp=500, hfirst_exp=50;
 	int tfirst=getFirstTemp();

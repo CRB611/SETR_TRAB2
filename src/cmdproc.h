@@ -17,7 +17,7 @@
  * 
  * \author Simão Ribeiro
  * \author Celina Brito
- * \date 1/4/2025
+ * \date 8/4/2025
  * \bug There are no known bugs.
  *
  * \defgroup C Module
@@ -177,17 +177,17 @@ unsigned int char2num(unsigned char ascii [], int length);
  void get_all( int *t, int *h, int *c);
 
  /**
-  * \brief Get last temp from the array
+  * \brief Get last temp value from the array
   */
  int getFirstTemp(void);
 
  /**
-  * \brief Get last hum from the array
+  * \brief Get last hum value from the array
   */
  int getFirstHum(void);
 
  /**
-  * \brief Get last co2 from the array
+  * \brief Get last co2 value from the array.
   */
  int getFirstco2(void);
  
@@ -211,6 +211,16 @@ void eraseRxBuff(int len);
  */
 void eraseTxBuff(int len);
 
+/**
+ * \brief Sets the sensor values.
+ * 
+ * This function was made for emulation purposes with the intent of filling the sensor data.
+ * \param t Array for the Temperature sensor. 
+ * \param h Array for the Humidity sensor. 
+ * \param c Array for the CO<sub>2 sensor. 
+ */
+
 void setValues(int t[MAX_SIZE], int h[MAX_SIZE], int c[MAX_SIZE]);
- #endif
+
+#endif
  
