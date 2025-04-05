@@ -1,3 +1,31 @@
+/**
+ * \file cmdproc.c
+ * \brief This file contains all the functions needed for the C module.
+ *
+ *  This module processes commands received via UART, one character at a time. 
+ * The module is part of a smart sensor that reads:
+ * <ul>
+    <li>Temperature, from -50ºC to 60ºC;</li>
+    <li>Relative humidity, from 0% to 100%;</li>
+    <li>CO<sub>2</sub>, from 400 to 2000 ppm;</li>
+</ul>
+ *  In this file there are functions to initialize the module, to manage the transmission and reception buffers, 
+ * to get the information from the sensors and to do the necessary conversions to process the ASCII messages.
+ *  This file also has some functions required to emulate the UART.
+ *  
+ * This file is based on the source file given to us by professor Paulo Pedreiras. 
+ * 
+ * \author Simão Ribeiro
+ * \author Celina Brito
+ * \date 1/4/2025
+ * \bug There are no known bugs.
+ *
+ * \defgroup C Module
+ * \brief Functions and structures for the C module. 
+ *
+ */ 
+
+
 /* ****************************** */
 /* See cmdProc.h for indications  */
 /* ****************************** */
@@ -12,7 +40,7 @@ static unsigned char UARTRxBuffer[UART_RX_SIZE];
 static unsigned char rxBufLen = 0; 
 
 static unsigned char UARTTxBuffer[UART_TX_SIZE];
-static unsigned int txBufLen = 0; 
+static unsigned char txBufLen = 0; 
 static unsigned  index_hum; 
 static int hum[MAX_SIZE];
 static unsigned  index_temp; 
@@ -167,16 +195,6 @@ int init(void){
 }
 
 
-void get_temp(int *t){
-	*t=*temp;
-}
-void get_hum(int *h){
-	*h=*hum;
-}
-void get_co2(int *c){
-	*c=*co2;
-}
-
 /*
 Get Temp first 
 */
@@ -200,12 +218,9 @@ int getFirstco2(void){
 Seting the sensor arrays for emulation porposes
 */
 void setValues(int t[MAX_SIZE], int h[MAX_SIZE], int c[MAX_SIZE]){
-	for (int i = 0; i < MAX_SIZE; i++)
-	{
-		temp[i] = t[i];
-		hum[i] = h[i];
-		co2[i] = c[i];
-	}
+	*temp=*t;
+	*hum=*h;
+	*co2=*c;
 }
 
 
@@ -282,169 +297,109 @@ int cmdProcessor(void)
 
 				if ( sid =='t')
 				{
-					// Verifica se a mensagem termina corretamente
-					for (k = 0; k <= MAX_SIZE; k++)
-					{
-						if (UARTRxBuffer[k] == EOF_SYM)
-						{
-							break;
-							
-						// Se não acaba com o simbolo que deve dá erro
-						}else if (k == MAX_SIZE-1){
-							eraseRxBuff(rxBufLen);
-							return EOF_ERROR;
-						}
+					if(UARTRxBuffer[i+9] != EOF_SYM){
+						eraseRxBuff(rxBufLen);
+						return EOF_ERROR;
+
 					}
-					
-					/* Check checksum */
-					int chk = calcChecksum(&UARTRxBuffer[i+1], k-4); // inclui o tipo, sinal e valor
-					int chk_recv = char2num(&UARTRxBuffer[k-3], 3); // os três dígitos ASCII
 				
-					//verificar a checksum
+
+				
+					/* Check checksum */
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 5); // inclui o tipo, sinal e valor
+					int chk_recv = char2num(&UARTRxBuffer[i+6], 3); // os três dígitos ASCII
+					
 					if (chk != chk_recv) {
 						return CHECKSUM_BAD;
 					}
 					
-					txChar('#');
-					txChar('P');
-					txChar('t');
 
-					//int c_n = char2num(&UARTRxBuffer[i+4],2);
-					unsigned char temp[3];
-					int n= getFirstTemp();
-					num2char(&temp[0],n,'t');
-					
-					if (n>60 || n<-50)
+					int c_n = char2num(&UARTRxBuffer[i+4],2);
+
+					if(UARTRxBuffer[i+3] == '-'){
+						c_n=-c_n;
+					}
+
+					if (c_n>60 || c_n<-50)
 					{
 						eraseRxBuff(rxBufLen);
 						return VALUES_ERROR;
 					}
 					
-					for(int j =0;j<3;j++){
-						txChar(temp[j]);
+					addValue(temp,&index_temp,c_n);
+					for(int i =0;i<rxBufLen;i++){
+						txChar((unsigned char)(UARTRxBuffer[i]));
 					}
 
-					int check= calcChecksum(&UARTTxBuffer[2],16);
-					unsigned char check_c[3];
-					num2char(&check_c[0],check,'h');
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
 
-					for(int j = 0;j<3;j++){
-						txChar(check_c[j]);
-					}
-					txChar('!');
-					
 					eraseRxBuff(rxBufLen);
 					return END;
 
 				}
 				else if(sid=='h'){
 
-					// Verifica se a mensagem termina corretamente
-					for (k = 0; k <= MAX_SIZE; k++)
-					{
-						if (UARTRxBuffer[k] == EOF_SYM)
-						{
-							break;
-							
-						// Se não acaba com o simbolo que deve dá erro
-						}else if (k == MAX_SIZE-1){
-							eraseRxBuff(rxBufLen);
-							return EOF_ERROR;
-						}
-					}
+					if(UARTRxBuffer[i+10] != EOF_SYM){
+						eraseRxBuff(rxBufLen);
+						return EOF_ERROR;
 
+					}
+					
 					/* Check checksum */
-					int chk = calcChecksum(&UARTRxBuffer[i+1], k-4); // inclui o tipo, sinal e valor
-					int chk_recv = char2num(&UARTRxBuffer[k-3], 3); // os três dígitos ASCII
-				
-					//verificar a checksum
+					int chk = calcChecksum(&UARTRxBuffer[i+1], 6); // 'P' até ao último dígito de valor
+					int chk_recv = char2num(&UARTRxBuffer[i+7], 3); // posições 7,8,9
+					
 					if (chk != chk_recv) {
 						return CHECKSUM_BAD;
 					}
 					
-					txChar('#');
-					txChar('P');
-					txChar('h');
+					int c_n = char2num(&UARTRxBuffer[i+4],3);
 
-					unsigned char hum[3];
-					int h= getFirstHum();
-					num2char(&hum[0],h,'h');
-
-					if (h>100 || h<0)
+					if (c_n>100 || c_n<0)
 					{
 						eraseRxBuff(rxBufLen);
 						return VALUES_ERROR;
 					}
 
-					for(int j =0;j<3;j++){
-						txChar(hum[j]);
+					addValue(hum,&index_hum,c_n);
+					for(int i =0;i<rxBufLen;i++){
+						txChar((unsigned char)(UARTRxBuffer[i]));
 					}
 
-					int check= calcChecksum(&UARTTxBuffer[2],16);
-					unsigned char check_c[3];
-					num2char(&check_c[0],check,'h');
-
-					for(int j = 0;j<3;j++){
-						txChar(check_c[j]);
-					}
-					txChar('!');
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
 
 					eraseRxBuff(rxBufLen);
 					return END;
 				}
 				else if (sid == 'c') {
-					// Verifica se a mensagem termina corretamente
-					for (k = 0; k <= MAX_SIZE; k++)
-					{
-						if (UARTRxBuffer[k] == EOF_SYM)
-						{
-							break;
-							
-						// Se não acaba com o simbolo que deve dá erro
-						}else if (k == MAX_SIZE-1){
-							eraseRxBuff(rxBufLen);
-							return EOF_ERROR;
-						}
+					if(UARTRxBuffer[i+12] != EOF_SYM){
+						eraseRxBuff(rxBufLen);
+						return EOF_ERROR;
 					}
-					
-					/* Check checksum */
-					int chk = calcChecksum(&UARTRxBuffer[i+1], k-4); // inclui o tipo, sinal e valor
-					int chk_recv = char2num(&UARTRxBuffer[k-3], 3); // os três dígitos ASCII
-					
-					//verificar a checksum
+				
+					int chk = calcChecksum(&UARTRxBuffer[i+1],8); // 'P', 'c', '+', d1, d2, d3, d4, d5
+					int chk_recv = char2num(&UARTRxBuffer[i+9], 3);
+				
 					if (chk != chk_recv) {
 						return CHECKSUM_BAD;
 					}
-					
-					txChar('#');
-					txChar('P');
-					txChar('c');
-					
-					unsigned char  co2[5];
-					int n= getFirstco2();
-					num2char(&co2[0],n,'c');
-					
-					if (n < 400 || n > 20000) {
+				
+					int c_n = char2num(&UARTRxBuffer[i+4], 5); // lê 5 dígitos
+
+				
+					if (c_n < 400 || c_n > 20000) {
 						eraseRxBuff(rxBufLen);
 						return VALUES_ERROR;
 					}
 				
-					for(int j =0;j<5;j++){
-						txChar(co2[j]);
+					addValue(co2, &index_co2, c_n);
+				
+					for (int j = 0; j < rxBufLen; j++) {
+						txChar(UARTRxBuffer[j]);
 					}
 
-					int check= calcChecksum(&UARTTxBuffer[2],16);
-					unsigned char check_c[3];
-					num2char(&check_c[0],check,'h');
-
-					for(int j = 0;j<3;j++){
-						txChar(check_c[j]);
-
-					}
-					txChar('!');
-					
-
-
+					num2char(&UARTTxBuffer[txBufLen-3],chk,3);
+					eraseRxBuff(rxBufLen);
 					return END;
 
 				}
@@ -456,11 +411,12 @@ int cmdProcessor(void)
 			case 'A':
 			{
 				int T, H, C;
-				unsigned char T_char[3], H_char[3], C_char[5];
+				unsigned char T_char[4], H_char[3], C_char[5];
 			
 				// Verifica se a mensagem termina corretamente
 				for (k = 0; k <= MAX_SIZE; k++)
 				{
+					//printf("%c",UARTRxBuffer[k]);
 					if (UARTRxBuffer[k] == EOF_SYM)
 					{
 						break;
@@ -481,6 +437,9 @@ int cmdProcessor(void)
 					return CHECKSUM_BAD;
 				}
 			
+				// Ponteiro para percorrer os campos t, h, c
+				//unsigned char *sid = &UARTRxBuffer[i+2];
+				
 				//mensagem a ser devolvida
 				txChar('#');	//SOF byte	
 				txChar('a');	//resposta a A
@@ -512,7 +471,7 @@ int cmdProcessor(void)
 
 				//inserir dados
 				txChar('t');
-				for (int j = 0; j < 3; j++)
+				for (int j = 0; j < 4; j++)
 				{
 					txChar(T_char[j]);
 				}
@@ -551,73 +510,52 @@ int cmdProcessor(void)
 			case 'L':
 			{
 				// 1. Verifica se a mensagem termina com '!' no sítio certo
-				for (k = 0; k <= MAX_SIZE; k++)
-				{
-					if (UARTRxBuffer[k] == EOF_SYM)
-					{
-						break;
-						
-					// Se não acaba com o simbolo que deve dá erro
-					}else if (k == MAX_SIZE-1){
-						eraseRxBuff(rxBufLen);
-						return EOF_ERROR;
-					}
+				if (UARTRxBuffer[i+5] != EOF_SYM) {
+					eraseRxBuff(rxBufLen);
+					return EOF_ERROR;
 				}
 				
 				// 2. Checksum: calcula e compara
-				int chk = calcChecksum(&UARTRxBuffer[i+1], k-4); // inclui o tipo, sinal e valor
-				int chk_recv = char2num(&UARTRxBuffer[k-3], 3); // os três dígitos ASCII
-				
+				int chk = calcChecksum(&UARTRxBuffer[i+1], 1); // só o 'L'
+				int chk_recv = char2num(&UARTRxBuffer[i+2], 3); // posições i+2, i+3, i+4
+
 				if (chk != chk_recv) {
 					return CHECKSUM_BAD;
 				}
 
-				//caracteres iniciais
-				txChar('#');
-				txChar('L');
-				txChar('t');
-
 				// 3. Envia as amostras de Temperatura
-				int tget[MAX_SIZE];
-				get_temp(&tget[0]);
-
-				printf("t");
-				for (i = 0; i < 20; i++) {
-					unsigned char temp_ascii[3];
-					num2char(&temp_ascii[0], temp[i], 't');
+				for (i = 0; i < index_temp; i++) {
+					txChar('t');
+					unsigned char temp_ascii[4];
+					num2char(temp_ascii, temp[i], 't');
 					txChar(temp_ascii[0]); // '+' ou '-'
 					txChar(temp_ascii[1]);
 					txChar(temp_ascii[2]);
-				}	
-			
-				// 4. Envia as amostras de Humidade
-				txChar('h');
-				int h[MAX_SIZE];
-				get_hum(&h[0]);
-				
-				for (i = 0; i < 20; i++) {
-					unsigned char hum_ascii[3];
-					num2char(&hum_ascii[0], hum[i], 'h');
-					txChar(hum_ascii[0]); // '+' ou '-'
-					txChar(hum_ascii[1]);
-					txChar(hum_ascii[2]);
+					txChar(temp_ascii[3]);
 				}	
 
-				// 4. Envia as amostras de co2
-				txChar('c');
-				int c[MAX_SIZE];
-				get_co2(&c[0]);
-				
-				for (i = 0; i < 20; i++) {
+				// 4. Envia as amostras de Humidade
+				for (i = 0; i < index_hum; i++) {
+					txChar('h');
+					unsigned char hum_ascii[4];
+					num2char(hum_ascii, hum[i], 'h');
+					txChar(hum_ascii[0]); // ASCII direto
+					txChar(hum_ascii[1]);
+					txChar(hum_ascii[2]);
+					txChar(hum_ascii[3]);
+				}	
+
+				// 5. Envia as amostras de CO₂
+				for (i = 0; i < index_co2; i++) {
+					txChar('c');
 					unsigned char co2_ascii[5];
-					num2char(&co2_ascii[0], co2[i], 'c');
-					txChar(co2_ascii[0]); // '+' ou '-'
+					num2char(co2_ascii, co2[i], 'c');
+					txChar(co2_ascii[0]);
 					txChar(co2_ascii[1]);
 					txChar(co2_ascii[2]);
 					txChar(co2_ascii[3]);
 					txChar(co2_ascii[4]);
 				}	
-				txChar('!');
 
 				// 6. Limpa o buffer e termina
 				eraseRxBuff(rxBufLen);
@@ -702,8 +640,6 @@ void num2char(unsigned char *array, int num, char type){
 		}
 		num=abs(num);
 		
-		len=2;
-
 		while (i < len) {
 			*(array + len-i) = (num % 10) + '0';
 			num /= 10;

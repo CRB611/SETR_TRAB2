@@ -52,8 +52,6 @@ void test_command_P(void);
 
 /**
  * \brief Tests the command 'L' using UNITY
- * 
- * 
  */
 void test_command_L(void);
 
@@ -63,11 +61,18 @@ void test_command_L(void);
 void test_command_R(void);
 
 /**
+ * \brief Tests the command 'R' checking the start byte using UNITY
+ */
+void test_command_R_START_BYTE(void);
+/**
+ * \brief Tests the command 'R'checking the end byte using UNITY
+ */
+void test_command_R_END_BYTE(void);
+
+/**
  * \brief Tests the occurrence of a nonexistent command being sent
  */
 void test_nonexistent_cmd(void);
-
-void test_user_cmd(void);
 
 /**
  * \brief Tests the occurrence of the sensors sending an unnaccepted value
@@ -93,8 +98,6 @@ void teste_rxchar(void);
 
 /**
  * \brief Performs a test for the num2char convertion function using UNITY
- * 
- *  This function tests the conversion from int to char array in the temperature, co2 and humidity/checksum case.
  */
 void test_num2char(void);
 

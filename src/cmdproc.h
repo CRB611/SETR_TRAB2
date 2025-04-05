@@ -33,7 +33,7 @@
  /* E.g. #define CMD_EMPTY_STRING -1                      */
  #define MAX_SIZE 20
  #define UART_RX_SIZE 30 	///< Maximum size of the RX buffer  
- #define UART_TX_SIZE 300 	///< Maximum size of the TX buffer 
+ #define UART_TX_SIZE 30 	///< Maximum size of the TX buffer 
  #define SOF_SYM '#'	        ///< Start of Frame Symbol
  #define EOF_SYM '!'         ///< End of Frame Symbol 
  #define EOF_ERROR -10       ///< End of frame error status code
@@ -156,19 +156,19 @@ unsigned int char2num(unsigned char ascii [], int length);
   * \brief Get the temperature array
   * \return The pointer for the temperature array
   */
- void get_temp(int *t);
+ int* get_temp(void);
  
  /**
   * \brief Get the humidity array
   * \return The pointer for the humidity array
   */
- void get_hum(int *h);
+ int* get_hum(void);
  
  /**
   * \brief Get the CO2 array
   * \return The pointer for the CO2 array
   */
- void get_co2(int *c);
+ int* get_co2(void);
  
  /**
   * \brief Get the temp,hum,co2 arrays

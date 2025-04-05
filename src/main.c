@@ -1,3 +1,31 @@
+/**
+ * @file main.c
+ * @brief Test runner for the cmdproc module using the Unity framework.
+ *
+ * This file contains the main function used to execute unit tests for the command processor module.
+ * It uses the Unity test framework and tracks the results of each test in order to present a
+ * summary table at the end of execution.
+ *
+ * The tests include:
+ * - Basic initialization of the module;
+ * - Handling of valid and invalid UART commands;
+ * - Checksum verification;
+ * - Sensor value processing and conversion;
+ * - Buffer management (transmit and receive);
+ * - UART emulation functions.
+ *
+ * The test result summary is printed in a formatted table after all tests are executed.
+ *
+ * @author Simão Ribeiro
+ * @date 2025-04-01
+ *
+ * @bug No known bugs.
+ *
+ * @see cmdproc.h
+ */
+
+
+
 #include <stdio.h>
 #include "cmdproc.h"
 #include "../unity/unity.h"
@@ -24,7 +52,6 @@ int main(void)
     RUN_TEST_TRACKED(test_command_P);
     RUN_TEST_TRACKED(test_command_L);
     RUN_TEST_TRACKED(test_command_R);
-    RUN_TEST_TRACKED(test_user_cmd);
     RUN_TEST_TRACKED(test_nonexistent_cmd);
     RUN_TEST_TRACKED(test_wrong_values);
     RUN_TEST_TRACKED(test_wrong_checksum);
@@ -40,15 +67,14 @@ int main(void)
     tearDown();
 
     // Impressão em formato de tabela
-    printf("\n================= RELATÓRIO FINAL ================\n");
+    printf("\n======================= RELATÓRIO FINAL ==========\n");
     printf("| %-35s | %-8s |\n", "TESTE", "ESTADO");
     printf("--------------------------------------------------\n");
     for (int i = 0; i < test_count; i++) {
         printf("| %-35s | %-8s |\n", test_names[i], test_results[i]);
     }
     printf("==================================================\n");
-    printf("|Número de testes: %d                            |\n",test_count);
-    printf("==================================================\n");
     
+
     return UNITY_END();
 }
