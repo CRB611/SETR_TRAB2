@@ -25,5 +25,7 @@ build/unity.o: unity/unity.c unity/unity.h unity/unity_internals.h
 clean:
 	rm -f *.o $(DEFAULT_TARGET)
 
-run:	$(DEFAULT_TARGET)
-	./$(DEFAULT_TARGET)
+run:
+	$(MAKE) $(TARGET)
+	./$(TARGET)
+
