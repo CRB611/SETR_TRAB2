@@ -44,7 +44,7 @@ In this project we were also asked to emulate the UART connection.
     </li>
      <li><b><u>build</u></b> Folder where the .o files are generated to.</li>
      <li><b><u>unity</u></b> Folder where the files required to use UNITY are stored.</li>
-     <li><i>makefile</i> The makefile that allows us to run the code.</li>
+     <li><i>makefile</i> The makefile that allows us to compile and run the code.</li>
 </ul>
 
 
@@ -53,7 +53,7 @@ To use this module run the make command on the main folder, this will generate t
 After the main executable is generated run ./main to execute.
 
 <b>Test scenarios covered:</b><br>
-A total of 17 tests are done, these tests cover the following areas:
+A total of 16 tests are done, these tests cover the following areas:
 <ul>
     <li><i>Initialization:</i> Initialization of the module.</li>
     <li><i>Command processing:</i> Each command is tested, including occurences where a wrong command or data is sent</li>
