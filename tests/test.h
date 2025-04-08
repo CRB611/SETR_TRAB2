@@ -72,6 +72,8 @@ void test_command_R(void);
  */
 void test_nonexistent_cmd(void);
 
+void test_user_cmd(void);
+
 /**
  * \brief Tests the occurrence of the sensors sending an unnaccepted value
  * 

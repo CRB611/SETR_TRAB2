@@ -52,6 +52,7 @@ int main(void)
     RUN_TEST_TRACKED(test_command_P);
     RUN_TEST_TRACKED(test_command_L);
     RUN_TEST_TRACKED(test_command_R);
+    RUN_TEST_TRACKED(test_user_cmd);
     RUN_TEST_TRACKED(test_nonexistent_cmd);
     RUN_TEST_TRACKED(test_wrong_values);
     RUN_TEST_TRACKED(test_wrong_checksum);
@@ -67,14 +68,15 @@ int main(void)
     tearDown();
 
     // Impressão em formato de tabela
-    printf("\n======================= RELATÓRIO FINAL ==========\n");
+    printf("\n================ RELATÓRIO FINAL ===============\n");
     printf("| %-35s | %-8s |\n", "TESTE", "ESTADO");
     printf("--------------------------------------------------\n");
     for (int i = 0; i < test_count; i++) {
         printf("| %-35s | %-8s |\n", test_names[i], test_results[i]);
     }
     printf("==================================================\n");
-    
+    printf("|Número de testes: %d                            |\n",test_count);
+    printf("==================================================\n");
 
     return UNITY_END();
 }

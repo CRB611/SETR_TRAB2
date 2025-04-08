@@ -232,6 +232,18 @@ void test_nonexistent_cmd(void){
 	TEST_ASSERT_EQUAL_INT(INV_COMM,cmdProcessor());
 }
 
+void test_user_cmd(void){
+	char com[6];
+	printf("Insert the correct message (#A065!): ");
+	scanf("%s",com);
+	for (long unsigned int i = 0; i < sizeof(com); i++)
+	{
+		rxChar(com[i]);
+	}
+
+	TEST_ASSERT_EQUAL_INT(OK,cmdProcessor());
+}
+
 void test_wrong_values(void) {
 
 	// Temperatura fora do intervalo (-60)
