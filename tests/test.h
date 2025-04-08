@@ -72,6 +72,9 @@ void test_command_R(void);
  */
 void test_nonexistent_cmd(void);
 
+/** 
+ * \brief Tests a command sent by the user 
+*/
 void test_user_cmd(void);
 
 /**
