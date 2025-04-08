@@ -8,7 +8,7 @@
  * 
  * \author Simão Ribeiro
  * \author Celina Brito
- * \date 8/4/2025
+ * \date 1/4/2025
  * \bug There are no known bugs.
  *
  * \defgroup test
@@ -39,17 +39,13 @@ void test_cmdproc_init(void);
 
 /**
  * \brief Tests the command 'A' using UNITY
- * 
- *  This test tests the command 'A' when everything should go right, by checking the return value and the contents on the transmission buffer.
- *  It also tests this command with missing SOF or EOF characters.
  */
 void test_command_A(void);
 
 /**
  * \brief Tests the command 'P' using UNITY
  * 
- * This test tests the command 'P' for all the sensors, by checking the return value and the contents on the transmission buffer.
- * It also tests the ocasion of a nonexistent command being sent, or the command missing SOF or EOF characters.
+ * This test tests the command 'P' for all the sensors and for a sensor that does not exists
  */
 void test_command_P(void);
 
@@ -57,13 +53,12 @@ void test_command_P(void);
 /**
  * \brief Tests the command 'L' using UNITY
  * 
- * This test tests the command 'L' when everything should go right, by checking the return value and the contents on the transmission buffer.
- * It also tests this command with missing SOF or EOF characters.
+ * 
  */
 void test_command_L(void);
 
 /**
- * This test tests the command 'L' when everything should go right, it also tests this command with missing SOF or EOF characters.
+ * \brief Tests the command 'R' using UNITY
  */
 void test_command_R(void);
 
@@ -72,9 +67,6 @@ void test_command_R(void);
  */
 void test_nonexistent_cmd(void);
 
-/** 
- * \brief Tests a command sent by the user 
-*/
 //void test_user_cmd(void);
 
 /**
@@ -86,8 +78,6 @@ void test_wrong_values(void);
 
 /**
  * \brief Tests the occurrence of a wrong checksum being sent
- * 
- *  This occurrence is tested in all the commands.
  */
 void test_wrong_checksum(void);
 
@@ -103,6 +93,8 @@ void teste_rxchar(void);
 
 /**
  * \brief Performs a test for the num2char convertion function using UNITY
+ * 
+ *  This function tests the conversion from int to char array in the temperature, co2 and humidity/checksum case.
  */
 void test_num2char(void);
 
@@ -135,9 +127,6 @@ void test_tbuff(void);
  */
 void test_addValue(void);
 
-/**
- * \brief Performs tests for the get functions.
- */
 void test_getsensor(void);
 
 #endif
