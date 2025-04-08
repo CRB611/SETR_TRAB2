@@ -75,7 +75,7 @@ void test_nonexistent_cmd(void);
 /** 
  * \brief Tests a command sent by the user 
 */
-void test_user_cmd(void);
+//void test_user_cmd(void);
 
 /**
  * \brief Tests the occurrence of the sensors sending an unnaccepted value

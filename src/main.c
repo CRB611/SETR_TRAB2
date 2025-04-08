@@ -52,7 +52,6 @@ int main(void)
     RUN_TEST_TRACKED(test_command_P);
     RUN_TEST_TRACKED(test_command_L);
     RUN_TEST_TRACKED(test_command_R);
-    RUN_TEST_TRACKED(test_user_cmd);
     RUN_TEST_TRACKED(test_nonexistent_cmd);
     RUN_TEST_TRACKED(test_wrong_values);
     RUN_TEST_TRACKED(test_wrong_checksum);

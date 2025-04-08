@@ -24,7 +24,7 @@ In this project we were also asked to emulate the UART connection.
     <li><i>Collection of data from sensors:</i> Functions to aquire the sensor data. </li>
     <li><i>Number to character conversions, and vice-versa:</i> The integer to char and char to integer conversion is guaranteed. </li>
     <li><i>UART and Sensor Emulation functions:</i> Functions to assure a correct UART and sensor emulation. </li>
-    <li><i>UNITY Testing:</i> A total of 17 tests are done using the UNITY engine. </li>
+    <li><i>UNITY Testing:</i> A total of 16 tests are done using the UNITY engine. </li>
 </ul>
 
 <b>File Structure:</b><br>
